@@ -5,14 +5,21 @@
 
 int main()
 {
-    std::string regexp = "[a\0a]";
-    Source tekscik(regexp);
-    Scanner lexer(&tekscik);
+    //EXAMPLE USE OF SCANNER
+    std::string regexp = R"(a*[]]\+[])";        //store a regular expression in a string
+    Source source(regexp);                      //create a source object for that string
+    Scanner scanner(&source);                   //create a scanner object for the source
+    Scanner::returnCode code;
 
-    Token a;
-    Token* ptr = &a;
-
-    ptr=ptr;
-
+    Token* tokenPtr = new Token();              //create a token
+    while(tokenPtr->getType() != Token::EOT)    //return token until EOT
+    {
+        code = scanner.getNextToken(tokenPtr);
+        if(code != Scanner::SUCCESS) std::cout << "ERROR, code: " << code << std::endl;
+        else tokenPtr->print();
+    }
+    //program outputs all tokens correctly,
+    //also correctly recognizes a missing bracket and returns a proper error code
+    delete tokenPtr;
     return 0;
 }

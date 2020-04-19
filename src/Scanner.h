@@ -5,8 +5,14 @@
 class Scanner
 {
     Source* source;
+    Token current;
 
 public:
+    enum returnCode
+    {
+        SUCCESS, BAD_ESCAPE, BAD_CHARACTER, MISSING_BRACKET
+    };
     Scanner(Source* sourceArg);
-    int getNextToken(Token* token);
+    returnCode getNextToken(Token* token);
+    bool getCurrToken(Token* token);
 };

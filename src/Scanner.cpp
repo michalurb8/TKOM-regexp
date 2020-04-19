@@ -1,16 +1,16 @@
 #include "Scanner.h"
-#include <iostream>
 
 Scanner::Scanner(Source* sourceArg)
 :source(sourceArg)
 {
 }
 
-int Scanner::getNextToken(Token* token)
+Scanner::returnCode Scanner::getNextToken(Token* token)
 {
     char ch = source->getChar();
-    token->textPos = source->getPos() - 1;
-    token->value = ch;
+    returnCode code = SUCCESS;
+    current.textPos = source->getPos() - 1;
+    current.value = ch;
     switch(ch)
     {
     case 'a'...'z':
@@ -19,69 +19,88 @@ int Scanner::getNextToken(Token* token)
     case ' ': case '!': case '"': case '#': case '%': case '&': case '\'':
     case ',': case '-': case '/': case ':': case ';': case '<': case '=':
     case '>': case '@': case '_': case '`': case '~': case '{': case '}': case ']':
-        token->type = Token::SYMBOL;
-        return 0;
+        current.type = Token::SYMBOL;
+        break;
     case '*':
     case '+':
     case '?':
-        token->type = Token::OPERATOR;
-        return 0;
+        current.type = Token::OPERATOR;
+        break;
     case '^':
     case '$':
     case '.':
-        token->type = Token::SPECIAL;
-        return 0;
+        current.type = Token::SPECIAL;
+        break;
     case '(':
-        token->type = Token::LPAREN;
-        return 0;
+        current.type = Token::LPAREN;
+        break;
     case ')':
-        token->type = Token::RPAREN;
-        return 0;
+        current.type = Token::RPAREN;
+        break;
     case '|':
-        token->type = Token::ALTER;
-        return 0;
+        current.type = Token::ALTER;
+        break;
     case '\\':
-        token->type = Token::ESC_SYMBOL;
+        current.type = Token::ESC_SYMBOL;
         ch = source->getChar();
         if(ch < ' ' || ch > '~')        //if next character is not printable, return bad_escape 2
         {
-            return 2;
+            *token = Token();
+            code = BAD_ESCAPE;
+            break;
         }
-        token->value = ch;
-        return 0;
+        current.value = ch;
+        break;
     case '[':                           //start of set
-        token->type = Token::SET;
+        current.type = Token::SET;
         ch = source->getChar();
         if(ch == 3)
         {
-            return 3;                   //return no matching bracket 3
+            *token = Token();
+            code = MISSING_BRACKET;             //return no matching bracket 3
+            break;
         }
-        if(ch == '^')                   //if ^ is first, add it check if ] is second
+        if(ch == '^')                   //if ^ is first, add it, then check if ] is second
         {
-            token->value += ch;
+            current.value += ch;
             ch = source->getChar();
             if(ch == 3)
             {
-                return 3;                   //return no matching bracket 3
+                *token = Token();
+                code = MISSING_BRACKET;         //return no matching bracket 3
+                break;                 
             }
             if(ch == ']')
-            token->value += ch;
+            current.value += ch;
         }
-        else token->value += ch;
+        else current.value += ch;
         do
         {
             ch = source->getChar();
             if(ch == 3)
             {
-                return 3;                   //return no matching bracket 3
+                *token = Token();
+                code = MISSING_BRACKET;         //return no matching bracket 3
+                break;                 
             }
-            token->value += ch;
+            current.value += ch;
         } while (ch != ']');
-        return 0;
+        break;
     case 3:                             //EOT character
-        token->type = Token::EOT;
-        return 0;
+        current.type = Token::EOT;
+        break;
+    default:
+        *token = Token();
+        code = BAD_CHARACTER;                 //if no character detected, return bad_character 1
+        break;
     }
-    //if no character detected, return bad_character 1
-    return 1;
+    *token = current;
+    return code;
+}
+
+bool Scanner::getCurrToken(Token* token)
+{
+    *token = current; 
+    if(token->type == Token::NOT_ASSINGED) return false;
+    return true;
 }

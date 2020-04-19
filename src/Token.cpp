@@ -1,10 +1,10 @@
 #include "Token.h"
-#include <iostream> //TODO TEMPORARY
+#include <iostream>
 
 Token::Token()
 {
     type = NOT_ASSINGED;
-    value = "NOT_ASSIGNED";
+    value = "";
     textPos = -1;
 }
 

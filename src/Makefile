@@ -15,10 +15,11 @@ Token.o: Token.cpp Token.h
 Scanner.o: Scanner.cpp Scanner.h
 	g++ -c $(CF) Scanner.cpp -o Scanner.o
 
-
-test: test.o Source.o Token.o Scanner.o
-	g++ test.o Source.o Token.o Scanner.o -o test
+test: build_test
 	./test
+
+build_test: test.o Source.o Token.o Scanner.o
+	g++ test.o Source.o Token.o Scanner.o -o test
 
 test.o: test.cpp
 	g++ -c $(CF) test.cpp -o test.o
@@ -30,7 +31,3 @@ run: all
 	./exe
 
 reset: clean all
-
-
-
-test does not work, \0 breaks
