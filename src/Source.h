@@ -4,5 +4,13 @@
 class Source
 {
     std::string text;
-    int readFromFile(std::string fileName);
+    unsigned int currentPos;
+    unsigned int size;
+
+public:
+    char peekChar();
+    char getChar();
+    Source(std::string textArg);
+    Source() = delete;
+    unsigned int getPos();
 };

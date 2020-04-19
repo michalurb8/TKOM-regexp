@@ -1,8 +1,7 @@
 CF = -Wall -std=c++11 -g
-CF = 
 
-all: main.o Source.o Token.o
-	g++ main.o Source.o Token.o -o exe
+all: main.o Source.o Token.o Scanner.o
+	g++ main.o Source.o Token.o Scanner.o -o exe
 
 main.o: main.cpp
 	g++ -c $(CF) main.cpp -o main.o
@@ -12,6 +11,9 @@ Source.o: Source.cpp Source.h
 
 Token.o: Token.cpp Token.h
 	g++ -c $(CF) Token.cpp -o Token.o
+
+Scanner.o: Scanner.cpp Scanner.h
+	g++ -c $(CF) Scanner.cpp -o Scanner.o
 
 
 
