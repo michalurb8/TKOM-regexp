@@ -1,7 +1,7 @@
 CF = -Wall -std=c++11 -g
 
 all: main.o Source.o Token.o Scanner.o
-	g++ main.o Source.o Token.o Scanner.o -o exe
+	g++ main.o Source.o Token.o Scanner.o -o exe.out
 
 main.o: main.cpp
 	g++ -c $(CF) main.cpp -o main.o
@@ -16,18 +16,18 @@ Scanner.o: Scanner.cpp Scanner.h
 	g++ -c $(CF) Scanner.cpp -o Scanner.o
 
 test: build_test
-	./test
+	./test.out
 
 build_test: test.o Source.o Token.o Scanner.o
-	g++ test.o Source.o Token.o Scanner.o -o test
+	g++ test.o Source.o Token.o Scanner.o -o test.out
 
 test.o: test.cpp
 	g++ -c $(CF) test.cpp -o test.o
 
 clean:
-	rm *.o exe test -rf
+	rm *.o *.out -rf
 
 run: all
-	./exe
+	./exe.out
 
 reset: clean all
