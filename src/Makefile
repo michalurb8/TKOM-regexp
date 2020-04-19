@@ -16,11 +16,21 @@ Scanner.o: Scanner.cpp Scanner.h
 	g++ -c $(CF) Scanner.cpp -o Scanner.o
 
 
+test: test.o Source.o Token.o Scanner.o
+	g++ test.o Source.o Token.o Scanner.o -o test
+	./test
+
+test.o: test.cpp
+	g++ -c $(CF) test.cpp -o test.o
 
 clean:
-	rm *.o exe -rf
+	rm *.o exe test -rf
 
 run: all
 	./exe
 
 reset: clean all
+
+
+
+test does not work, \0 breaks

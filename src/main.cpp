@@ -5,16 +5,14 @@
 
 int main()
 {
-    Source tekscik("aBcE5");
+    std::string regexp = "[a\0a]";
+    Source tekscik(regexp);
     Scanner lexer(&tekscik);
 
     Token a;
     Token* ptr = &a;
-    std::cout << lexer.getNextToken(ptr) << std::endl;
-    std::cout << lexer.getNextToken(ptr) << std::endl;
-    std::cout << lexer.getNextToken(ptr) << std::endl;
-    std::cout << lexer.getNextToken(ptr) << std::endl;
-    std::cout << lexer.getNextToken(ptr) << std::endl;
-//    a.Print();
+
+    ptr=ptr;
+
     return 0;
 }

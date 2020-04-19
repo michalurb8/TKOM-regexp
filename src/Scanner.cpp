@@ -1,4 +1,5 @@
 #include "Scanner.h"
+#include <iostream>
 
 Scanner::Scanner(Source* sourceArg)
 :source(sourceArg)
@@ -8,7 +9,7 @@ Scanner::Scanner(Source* sourceArg)
 int Scanner::getNextToken(Token* token)
 {
     char ch = source->getChar();
-    token->textPos=source->getPos();
+    token->textPos = source->getPos() - 1;
     token->value = ch;
     switch(ch)
     {
@@ -42,13 +43,45 @@ int Scanner::getNextToken(Token* token)
     case '\\':
         token->type = Token::ESC_SYMBOL;
         ch = source->getChar();
-        if(ch < ' ' || ch > '~') //if next character cant be escaped, return bad_escape 2
+        if(ch < ' ' || ch > '~')        //if next character is not printable, return bad_escape 2
         {
             return 2;
         }
         token->value = ch;
         return 0;
-    default:
-        return 50;
+    case '[':                           //start of set
+        token->type = Token::SET;
+        ch = source->getChar();
+        if(ch == 3)
+        {
+            return 3;                   //return no matching bracket 3
+        }
+        if(ch == '^')                   //if ^ is first, add it check if ] is second
+        {
+            token->value += ch;
+            ch = source->getChar();
+            if(ch == 3)
+            {
+                return 3;                   //return no matching bracket 3
+            }
+            if(ch == ']')
+            token->value += ch;
+        }
+        else token->value += ch;
+        do
+        {
+            ch = source->getChar();
+            if(ch == 3)
+            {
+                return 3;                   //return no matching bracket 3
+            }
+            token->value += ch;
+        } while (ch != ']');
+        return 0;
+    case 3:                             //EOT character
+        token->type = Token::EOT;
+        return 0;
     }
+    //if no character detected, return bad_character 1
+    return 1;
 }
