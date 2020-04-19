@@ -19,6 +19,7 @@ Scanner::returnCode Scanner::getNextToken(Token* token)
     case ' ': case '!': case '"': case '#': case '%': case '&': case '\'':
     case ',': case '-': case '/': case ':': case ';': case '<': case '=':
     case '>': case '@': case '_': case '`': case '~': case '{': case '}': case ']':
+    //any basic character to be recognized e.g. a, b, c, }
         current.type = Token::SYMBOL;
         break;
     case '*':
@@ -41,64 +42,62 @@ Scanner::returnCode Scanner::getNextToken(Token* token)
         current.type = Token::ALTER;
         break;
     case '\\':
+    //escaped character
         current.type = Token::ESC_SYMBOL;
         ch = source->getChar();
-        if(ch < ' ' || ch > '~')        //if next character is not printable, return bad_escape 2
+        if(ch < ' ' || ch > '~')        //if escaped character is not printable, return BAD_ESCAPE
         {
             *token = Token();
             code = BAD_ESCAPE;
             break;
         }
-        current.value = ch;
+        current.value = ch;             //if it is printable, set token value to it
         break;
     case '[':                           //start of set
         current.type = Token::SET;
         ch = source->getChar();
-        if(ch == 3)
+        if(ch == 0x03)
         {
             *token = Token();
-            code = MISSING_BRACKET;             //return no matching bracket 3
+            code = MISSING_BRACKET;     //return MISSING_BRACKET if found EOT before ]
             break;
         }
-        if(ch == '^')                   //if ^ is first, add it, then check if ] is second
+        if(ch == '^')                   //if ^ is first, add it before anything and take the next
         {
             current.value += ch;
             ch = source->getChar();
-            if(ch == 3)
+            if(ch == 0x03)
             {
                 *token = Token();
-                code = MISSING_BRACKET;         //return no matching bracket 3
-                break;                 
+                code = MISSING_BRACKET;     //return MISSING_BRACKET if found EOT before ]
+                break;
             }
-            if(ch == ']')
-            current.value += ch;
         }
-        else current.value += ch;
-        do
+        current.value += ch;                //add the first element to the set (including ])
+        do                                  //add characters to token value until ]
         {
             ch = source->getChar();
-            if(ch == 3)
+            if(ch == 0x03)
             {
                 *token = Token();
-                code = MISSING_BRACKET;         //return no matching bracket 3
+                code = MISSING_BRACKET; //return MISSING_BRACKET if found EOT before ]
                 break;                 
             }
             current.value += ch;
         } while (ch != ']');
         break;
-    case 3:                             //EOT character
+    case 0x03:                          //EOT character
         current.type = Token::EOT;
         break;
     default:
         *token = Token();
-        code = BAD_CHARACTER;                 //if no character detected, return bad_character 1
-        break;
+        code = BAD_CHARACTER;           //if other character detected, return BAD_CHARACTER
     }
-    *token = current;
+    *token = current;        //set the argument token to the current one stored as a member
     return code;
 }
 
-bool Scanner::getCurrToken(Token* token)
+bool Scanner::getCurrToken(Token* token) const
 {
     *token = current; 
     if(token->type == Token::NOT_ASSINGED) return false;

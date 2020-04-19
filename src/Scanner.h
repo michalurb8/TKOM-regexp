@@ -14,5 +14,5 @@ public:
     };
     Scanner(Source* sourceArg);
     returnCode getNextToken(Token* token);
-    bool getCurrToken(Token* token);
+    bool getCurrToken(Token* token) const;
 };

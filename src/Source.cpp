@@ -4,10 +4,11 @@
 Source::Source(std::string textArg)
 :text(textArg), currentPos(0)
 {
+    text+=(char)0x03;
     size = text.length();
 }
 
-char Source::peekChar()
+char Source::peekChar() const
 {
     if(currentPos<size)
     {
@@ -21,7 +22,7 @@ char Source::peekChar()
 
 char Source::getChar()
 {
-    if(currentPos<size)
+    if(currentPos < size)
     {
         ++currentPos;
         return text[currentPos-1];
@@ -32,7 +33,7 @@ char Source::getChar()
     }
 }
 
-unsigned int Source::getPos()
+unsigned int Source::getPos() const
 {
     return currentPos;
 }

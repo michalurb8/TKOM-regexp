@@ -2,15 +2,17 @@
 #include <iostream>
 
 Token::Token()
+:type(NOT_ASSINGED), value(""), textPos(-1)
 {
-    type = NOT_ASSINGED;
-    value = "";
-    textPos = -1;
 }
 
 void Token::print() const
 {
-    std::cout << "type: '" << type << "' value: '" << value << "' position: " << textPos << std::endl;
+    std::cout
+    << "type: " << type
+    << ", value: '" << value
+    << "', position: " << textPos
+    << std::endl;
 }
 
 Token::token_type Token::getType() const

@@ -5,7 +5,7 @@
 
 int main()
 {
-    //EXAMPLE USE OF SCANNER
+    //EXAMPLE USE OF THE SCANNER
     std::string regexp = R"(a*[]]\+[])";        //store a regular expression in a string
     Source source(regexp);                      //create a source object for that string
     Scanner scanner(&source);                   //create a scanner object for the source
@@ -23,3 +23,10 @@ int main()
     delete tokenPtr;
     return 0;
 }
+
+
+
+//other regular expressions to test on:
+
+//std::string regexp = R"([]][^dsfg][][][^^][a][a[]])";
+//std::string regexp = R"(!@#$%^&*()_-=+}{][:""]}":/?><,.")";

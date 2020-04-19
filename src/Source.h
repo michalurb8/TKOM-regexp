@@ -8,9 +8,9 @@ class Source
     unsigned int size;
 
 public:
-    char peekChar();
+    char peekChar() const;
     char getChar();
     Source(std::string textArg);
     Source() = delete;
-    unsigned int getPos();
+    unsigned int getPos() const;
 };

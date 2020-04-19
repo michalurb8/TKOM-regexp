@@ -5,7 +5,7 @@
 
 bool Assert(bool check, std::string message)
 {
-    if(!check) std::cout << "ERROR in test: " << message << std::endl;
+    if(!check) std::cout << "Test failed: " << message << std::endl;
     return check;
 }
 
@@ -25,7 +25,7 @@ int main()
     Assert(source.getChar() == 0x03, "GET_CHAR_WORKS_END_OF_TEXT");
     Assert(source.getChar() == 0x03, "GET_CHAR_WORKS_END_OF_TEXT_AGAIN");
     Assert(source.peekChar() == 0x03, "PEEK_CHAR_WORKS_END_OF_TEXT");
-    Assert(source.getPos() == 3, "GET_POS_STAYS_AT_THE_END");
+    Assert(source.getPos() == 4, "GET_POS_STAYS_AT_THE_END");
 
     source = Source("ab*()");
     Scanner scanner(&source);
@@ -46,6 +46,7 @@ int main()
     Assert(scanner.getNextToken(&temp) == Scanner::SUCCESS, "GET_NEXT_WORKS_)");
     Assert(scanner.getNextToken(&temp) == Scanner::SUCCESS, "GET_NEXT_WORKS_EOT");
     Assert(temp.getType() == Token::EOT, "GET_EOT_TYPE_CORRECT");
+    Assert(temp.getTextPos() == 5, "GET_EOT_POS_CORRECT");
 
     source = Source("[^]]a[");
     Assert(scanner.getNextToken(&temp) == Scanner::SUCCESS, "GET_NEXT_WORKS_SET");
