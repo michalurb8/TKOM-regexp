@@ -1,36 +1,42 @@
 #include <string>
 #include "Source.h"
 
+Source::Source()
+{
+    size = 0;
+    text = "";
+}
+
 Source::Source(std::string textArg)
 :text(textArg), currentPos(0)
 {
-    text+=(char)0x03;
     size = text.length();
 }
 
 char Source::peekChar() const
 {
-    if(currentPos<size)
+    if(currentPos < size)
     {
         return text[currentPos];
     }
     else
     {
-        return 0x03; //EOT
+        return 0x03;
     }
 }
 
 char Source::getChar()
 {
+    char result;
     if(currentPos < size)
     {
-        ++currentPos;
-        return text[currentPos-1];
+        result = text[currentPos++];
     }
     else
     {
-        return 0x03; //EOT
+        result = 0x03;
     }
+    return result;
 }
 
 unsigned int Source::getPos() const

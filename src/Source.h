@@ -11,6 +11,6 @@ public:
     char peekChar() const;
     char getChar();
     Source(std::string textArg);
-    Source() = delete;
+    Source();
     unsigned int getPos() const;
 };

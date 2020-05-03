@@ -8,11 +8,7 @@ class Scanner
     Token current;
 
 public:
-    enum returnCode
-    {
-        SUCCESS, BAD_ESCAPE, BAD_CHARACTER, MISSING_BRACKET
-    };
     Scanner(Source* sourceArg);
-    returnCode getNextToken(Token* token);
-    bool getCurrToken(Token* token) const;
+    Token getNextToken();
+    Token getCurrentToken();
 };
