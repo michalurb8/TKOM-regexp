@@ -6,7 +6,7 @@
 int main()
 {
     //EXAMPLE USE OF THE SCANNER
-    std::string regexp = R"(abc\)";             //store a regular expression in a string
+    std::string regexp = R"(a*\\\*bc\)";        //store a regular expression in a string
     Source source(regexp);                      //create a source object for that string
     Scanner scanner(&source);                   //create a scanner object for the source
 

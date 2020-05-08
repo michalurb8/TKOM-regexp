@@ -11,6 +11,7 @@ Token Scanner::getNextToken()
     char ch = source->getChar();
     if(ch == '\\')
     {
+        current.escaped = true;
         ch = source->peekChar();
         if(ch == 0x03)
         {
@@ -25,6 +26,7 @@ Token Scanner::getNextToken()
     else
     {
         current.value = ch;
+        current.escaped = false;
     }
     return getCurrentToken();
 }
