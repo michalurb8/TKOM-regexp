@@ -11,14 +11,15 @@ Token Scanner::getNextToken()
     char ch = source->getChar();
     if(ch == '\\')
     {
-        current.escaped = true;
         ch = source->peekChar();
         if(ch == 0x03)
         {
+            current.escaped = false;
             current.value = '\\';
         }
         else
         {
+            current.escaped = true;
             ch = source->getChar();
             current.value = ch;
         }

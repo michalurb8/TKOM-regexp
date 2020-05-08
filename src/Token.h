@@ -7,11 +7,7 @@ struct Token
     unsigned int textPos;       //token position in text, used for debugging
     bool escaped;
 
-public:
     Token();
-
-    char  getValue() const;
-    unsigned int getTextPos() const;
 };
 
 void print(Token arg);

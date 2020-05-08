@@ -6,15 +6,6 @@ Token::Token()
 {
 }
 
-char Token::getValue() const
-{
-    return value;
-}
-unsigned int Token::getTextPos() const
-{
-    return textPos;
-}
-
 void print(Token arg)
 {
     std::cout

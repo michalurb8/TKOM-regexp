@@ -43,3 +43,8 @@ unsigned int Source::getPos() const
 {
     return currentPos;
 }
+
+void Source::reset()
+{
+    currentPos = 0;
+}
