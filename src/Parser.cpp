@@ -1,36 +1,34 @@
 #include "Parser.h"
 #include <iostream>
-Parser::Parser(Scanner* arg)
-:scanner(arg), errorPos(-1)
+Parser::Parser(std::string text)
+:errorPos(-1), scanner(text)
 {
 }
 
 bool Parser::Parse()
 {
-    std::cout << "REG" << std::endl;
-    scanner->getNextToken(); //load first token
-    return ParseAlt();
+    scanner.getNextToken(); //load first token
+    if(!ParseAlt()) return false;
+    if(!checkEOT(scanner.getCurrentToken())) return false;
+    std::cout << "eot" << std::endl;
+    return true;
 }
 
 bool Parser::ParseAlt()
 {
-    std::cout << "ALT" << std::endl;
     if(!ParseCon()) return false;
-    Token checkLoop = scanner->getCurrentToken();
-    while(checkLoop.value == '|' && checkLoop.escaped == false)
+    while(checkAlt(scanner.getCurrentToken()))
     {
-        std::cout << "alt" << std::endl;
-        //parsing alternative here
-        scanner->getNextToken();
+        scanner.getNextToken();
+        //parsing alternative sign here
+        std::cout << '|' << std::endl;
         if(!ParseCon()) return false;
-        checkLoop = scanner->getCurrentToken();
     }
-    return true;
+   return true;
 }
 
 bool Parser::ParseCon()
 {
-    std::cout << "CON" << std::endl;
     if(!ParseElem()) return false;
     while(ParseElem()){}
     return true;
@@ -38,41 +36,39 @@ bool Parser::ParseCon()
 
 bool Parser::ParseElem()
 {
-    std::cout << "ELE" << std::endl;
-    if(checkSymbol(scanner->getCurrentToken()))
+    if(checkSymbol(scanner.getCurrentToken()))
     {
-        std::cout << "symb" << std::endl;
         //parsing single symbol here TODO
-        scanner->getNextToken();
+        std::cout << scanner.getCurrentToken().value << std::endl;
+        scanner.getNextToken();
     }
     else if(ParseParen()) {}
     else if(ParseSet()) {}
     else return false;
-    if(checkOperator(scanner->getCurrentToken()))
+    if(checkOperator(scanner.getCurrentToken()))
     {
-        std::cout << "operator" << std::endl;
         //parsing operator here TODO
-        scanner->getNextToken();
+        std::cout << "op " << scanner.getCurrentToken().value << std::endl;
+        scanner.getNextToken();
     }
     return true;
 }
 
 bool Parser::ParseParen()
 {
-    std::cout << "PAREN" << std::endl;
-    if(scanner->getCurrentToken().value == '(' && scanner->getCurrentToken().escaped == false)
+    if(checkLParen(scanner.getCurrentToken()))
     {
-        std::cout << "lparen" << std::endl;
         //parsing Lparen here TODO
-        scanner->getNextToken();
+        std::cout << "paren" << scanner.getCurrentToken().value << std::endl;
+        scanner.getNextToken();
     }
     else return false;
     ParseAlt();
-    if(scanner->getCurrentToken().value == ')' && scanner->getCurrentToken().escaped == false)
+    if(checkRParen(scanner.getCurrentToken()))
     {
-        std::cout << "rparen" << std::endl;
+        std::cout << "paren" << scanner.getCurrentToken().value << std::endl;
         //parsing Rparen here TODO
-        scanner->getNextToken();
+        scanner.getNextToken();
     }
     else return false;
     return true;
@@ -80,36 +76,67 @@ bool Parser::ParseParen()
 
 bool Parser::ParseInter()
 {
-    std::cout << "INTER" << std::endl;
-    if(checkInBrackets(scanner->getCurrentToken()))
+    if(checkInBrackets(scanner.getCurrentToken()))
     {
+        std::cout << scanner.getCurrentToken().value << std::endl;
         //parsing first inbracket here TODO
-        scanner->getNextToken();
+        scanner.getNextToken();
     }
     else return false;
-    if(scanner->getCurrentToken().value == '-' && scanner->getCurrentToken().escaped == false)
+    if(checkInterval(scanner.getCurrentToken()))
     {
-        //parsing Rparen here TODO
-        scanner->getNextToken();
-    }
-    else return false;
-    if(checkInBrackets(scanner->getCurrentToken()))
-    {
-        //parsing second inbracket here TODO
-        scanner->getNextToken();
+        std::cout << "interval" << scanner.getCurrentToken().value << std::endl;
+        //parsing interval here TODO
+        scanner.getNextToken();
+        if(checkInBrackets(scanner.getCurrentToken()))
+        {
+            std::cout << scanner.getCurrentToken().value << std::endl;
+            //parsing second inbracket here TODO
+            scanner.getNextToken();
+        }
+        else return false;
     }
     return true;
 }
 
 bool Parser::ParseSet()
 {
-    std::cout << "SET" << std::endl;
-    return false;
+
+    if(checkLBracket(scanner.getCurrentToken()))
+    {
+        std::cout << "bracket" << scanner.getCurrentToken().value << std::endl;
+        //parsing lB here TODO
+        scanner.getNextToken();
+    }
+    else return false;
+    if(checkCaret(scanner.getCurrentToken()))
+    {
+        std::cout << "caret" << scanner.getCurrentToken().value << std::endl;
+        //parsing caret here TODO
+        scanner.getNextToken();
+    } //optional
+    if(checkRBracket(scanner.getCurrentToken()))
+    {
+        std::cout << "rbrack" << scanner.getCurrentToken().value << std::endl;
+        //parsing rbrack here TODO
+        scanner.getNextToken();
+    }
+    else if(ParseInter()) {}
+    else return false;
+    while(ParseElem()){}
+    if(checkRBracket(scanner.getCurrentToken()))
+    {
+        std::cout << "bracket" << scanner.getCurrentToken().value << std::endl;
+        //parsing rB here TODO
+        scanner.getNextToken();
+    }
+    else return false;
+    return true;
 }
 
 unsigned int Parser::getErrorPos()
 {
-    return scanner->getCurrentToken().textPos;
+    return scanner.getCurrentToken().textPos;
 }
 
 bool checkOperator(Token arg)
@@ -145,4 +172,52 @@ bool checkInBrackets(Token arg)
     if(arg.value == '-') return false;
     if(arg.value == ']') return false;
     return true;
+}
+
+bool checkLParen(Token arg)
+{
+    if(arg.value == '(' && arg.escaped == false) return true;
+    return false;
+}
+
+bool checkRParen(Token arg)
+{
+    if(arg.value == ')' && arg.escaped == false) return true;
+    return false;
+}
+
+bool checkLBracket(Token arg)
+{
+    if(arg.value == '[' && arg.escaped == false) return true;
+    return false;
+}
+
+bool checkRBracket(Token arg)
+{
+    if(arg.value == ']' && arg.escaped == false) return true;
+    return false;
+}
+
+bool checkAlt(Token arg)
+{
+    if(arg.value == '|' && arg.escaped == false) return true;
+    return false;
+}
+
+bool checkCaret(Token arg)
+{
+    if(arg.value == '^' && arg.escaped == false) return true;
+    return false;
+}
+
+bool checkInterval(Token arg)
+{
+    if(arg.value == '-' && arg.escaped == false) return true;
+    return false;
+}
+
+bool checkEOT(Token arg)
+{
+    if(arg.value == 0x03) return true;
+    return false;
 }

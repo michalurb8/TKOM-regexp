@@ -7,18 +7,9 @@
 int main()
 {
     //EXAMPLE USE OF THE SCANNER
-    std::string regexp = R"(a++)";        //store a regular expression in a string
-    Source source(regexp);                      //create a source object for that string
-    Scanner scanner(&source);                   //create a scanner object for the source
-    Parser parser(&scanner);
+    std::string regexp = R"(a?s(a[aac]*)|df)";  //store a regular expression in a string
+    Parser parser(regexp);
 
-    Token temp;
-    do                                          //return token until EOT
-    {
-        temp = scanner.getNextToken();
-        //print(temp);
-    } while(temp.value != 0x03);
-    source.reset();
     std::cout << (parser.Parse() ? "success" : "fail") << std::endl;
 
     return 0;

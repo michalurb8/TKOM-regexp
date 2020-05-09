@@ -4,11 +4,13 @@
 
 class Scanner
 {
-    Source* source;
+    Source source;
     Token current;
 
 public:
-    Scanner(Source* sourceArg);
+    Scanner() = delete;
+    Scanner(std::string text);
+
     Token getNextToken();
     Token getCurrentToken();
 };

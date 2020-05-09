@@ -1,17 +1,17 @@
 #include "Scanner.h"
 
-Scanner::Scanner(Source* sourceArg)
-:source(sourceArg)
+Scanner::Scanner(std::string text)
+:source(text)
 {
 }
 
 Token Scanner::getNextToken()
 {
-    current.textPos = source->getPos();
-    char ch = source->getChar();
+    current.textPos = source.getPos();
+    char ch = source.getChar();
     if(ch == '\\')
     {
-        ch = source->peekChar();
+        ch = source.peekChar();
         if(ch == 0x03)
         {
             current.escaped = false;
@@ -20,7 +20,7 @@ Token Scanner::getNextToken()
         else
         {
             current.escaped = true;
-            ch = source->getChar();
+            ch = source.getChar();
             current.value = ch;
         }
     }
