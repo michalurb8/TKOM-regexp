@@ -1,13 +1,15 @@
 #include "Parser.h"
-#include <iostream>
+#include <iostream> //to be removed
+
 Parser::Parser(std::string text)
-:errorPos(-1), scanner(text)
+:errorDesc(""), scanner(text)
 {
 }
 
 bool Parser::Parse()
 {
-    scanner.getNextToken(); //load first token
+    errorDesc="";
+    scanner.getNextToken();
     if(!ParseAlt()) return false;
     if(!checkEOT(scanner.getCurrentToken())) return false;
     std::cout << "eot" << std::endl;
@@ -70,7 +72,11 @@ bool Parser::ParseParen()
         //parsing Rparen here TODO
         scanner.getNextToken();
     }
-    else return false;
+    else
+    {
+        errorDesc = "Missing )";
+        return false;
+    }
     return true;
 }
 
@@ -94,7 +100,11 @@ bool Parser::ParseInter()
             //parsing second inbracket here TODO
             scanner.getNextToken();
         }
-        else return false;
+        else
+        {
+            errorDesc = "Current token does not match any set[] element";
+            return false;
+        }
     }
     return true;
 }
@@ -122,102 +132,32 @@ bool Parser::ParseSet()
         scanner.getNextToken();
     }
     else if(ParseInter()) {}
-    else return false;
-    while(ParseElem()){}
+    else
+    {
+        errorDesc = "Current token does not match any set[] element";
+        return false;
+    }
+    while(ParseInter()){}
     if(checkRBracket(scanner.getCurrentToken()))
     {
         std::cout << "bracket" << scanner.getCurrentToken().value << std::endl;
         //parsing rB here TODO
         scanner.getNextToken();
     }
-    else return false;
-    return true;
-}
-
-unsigned int Parser::getErrorPos()
-{
-    return scanner.getCurrentToken().textPos;
-}
-
-bool checkOperator(Token arg)
-{
-    if(arg.escaped == true) return false;
-    if(arg.value == 0x03) return false;
-    if(arg.value == '*') return true;
-    if(arg.value == '+') return true;
-    if(arg.value == '?') return true;
-    return false;
-}
-
-
-bool checkSymbol(Token arg)
-{
-    if(arg.escaped == true) return true;
-    switch(arg.value)
+    else
     {
-        case '(': case ')': case '[': case ']':
-        case '*': case '+': case '?':
-        case '-':
-        case '|':
-        case 0x03:
+        errorDesc = "Current token does not match ] symbol";
         return false;
     }
     return true;
 }
 
-bool checkInBrackets(Token arg)
+unsigned int Parser::getErrorPos() const
 {
-    if(arg.escaped == true) return true;
-    if(arg.value == 0x03) return false;
-    if(arg.value == '-') return false;
-    if(arg.value == ']') return false;
-    return true;
+    return scanner.getCurrentToken().textPos;
 }
 
-bool checkLParen(Token arg)
+const std::string& Parser::getErrorDesc() const
 {
-    if(arg.value == '(' && arg.escaped == false) return true;
-    return false;
-}
-
-bool checkRParen(Token arg)
-{
-    if(arg.value == ')' && arg.escaped == false) return true;
-    return false;
-}
-
-bool checkLBracket(Token arg)
-{
-    if(arg.value == '[' && arg.escaped == false) return true;
-    return false;
-}
-
-bool checkRBracket(Token arg)
-{
-    if(arg.value == ']' && arg.escaped == false) return true;
-    return false;
-}
-
-bool checkAlt(Token arg)
-{
-    if(arg.value == '|' && arg.escaped == false) return true;
-    return false;
-}
-
-bool checkCaret(Token arg)
-{
-    if(arg.value == '^' && arg.escaped == false) return true;
-    return false;
-}
-
-bool checkInterval(Token arg)
-{
-    if(arg.value == '-' && arg.escaped == false) return true;
-    return false;
-}
-
-bool checkEOT(Token arg)
-{
-    if(arg.value == 0x03) return true;
-    return false;
+    return errorDesc;
 }

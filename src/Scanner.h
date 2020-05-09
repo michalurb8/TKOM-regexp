@@ -12,5 +12,5 @@ public:
     Scanner(std::string text);
 
     Token getNextToken();
-    Token getCurrentToken();
+    Token getCurrentToken() const;
 };

@@ -32,7 +32,7 @@ Token Scanner::getNextToken()
     return getCurrentToken();
 }
 
-Token Scanner::getCurrentToken()
+Token Scanner::getCurrentToken() const
 {
     return current;
 }

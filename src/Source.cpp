@@ -1,4 +1,3 @@
-#include <string>
 #include "Source.h"
 
 Source::Source()
@@ -11,19 +10,6 @@ Source::Source(std::string textArg)
 :text(textArg), currentPos(0)
 {
     size = text.length();
-}
-Source::Source(const Source& arg)
-:text(arg.text), currentPos(arg.currentPos), size(arg.size)
-{
-}
-Source Source::operator=(const Source&arg)
-{
-    text = arg.text;
-    currentPos = arg.currentPos;
-    size = arg.size;
-}
-Source::~Source()
-{
 }
 
 char Source::peekChar() const

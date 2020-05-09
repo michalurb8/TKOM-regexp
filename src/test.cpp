@@ -12,9 +12,9 @@ bool Assert(bool check, std::string message)
 int main()
 {
     Token temp;
-    Source source("");
     Scanner scanner(&source);
 
+//to be refactored to boost tests
     source = Source("abc");
     Assert(source.getPos() == 0, "GET_POS_STARTS_AT_0");
     Assert(source.peekChar() == 'a', "PEEK_CHAR_WORKS");

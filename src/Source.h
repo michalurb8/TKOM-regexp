@@ -10,9 +10,6 @@ class Source
 public:
     Source();
     Source(std::string textArg);
-    Source(const Source& arg);
-    Source operator=(const Source&arg);
-    ~Source();
 
     char peekChar() const;
     char getChar();
