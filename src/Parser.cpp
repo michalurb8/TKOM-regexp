@@ -161,3 +161,19 @@ const std::string& Parser::getErrorDesc() const
 {
     return errorDesc;
 }
+
+
+//done according to the following grammar:
+/*
+    Reg -> Alt;
+    Alt -> Con, {"|", Con};
+    Con -> Elem, {Elem};
+    Elem -> (symbol, Paren, Set), [op];
+    Paren -> "(", Alt, ")";
+    Set -> "[", ["^"], ("]" | Inter), {Inter}, "]";
+    Inter -> inset, ["-", inset];
+
+    symbol -> ?all escaped? + ")" + "]" + "." + "^" + "$" + "-";
+    inset -> ?all? - "-" - "]";
+    op -> "*", "+", "?";
+*/
