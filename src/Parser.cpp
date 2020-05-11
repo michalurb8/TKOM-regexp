@@ -1,19 +1,26 @@
 #include "Parser.h"
+#include <iostream>
 
 Parser::Parser(std::string text)
-:errorDesc(""), scanner(text)
+:errorDesc(""), scanner(text), valid(true)
 {
 }
 
-bool Parser::Parse() //Reg -> Alt, $;
+void Parser::Parse() //Reg -> Alt, $;
 {
     result.reset();
     errorDesc = "";
     scanner.getNextToken();
+    valid = true;
 
     //Parsing ALT:
     if(ParseAlt()) {}
-    else return false;
+    else
+    {
+        errorDesc = "Empty expression";
+        valid = false;
+        return;
+    }
     //Parsing $:
     if(checkEOT(scanner.getCurrentToken()))
     {
@@ -22,11 +29,11 @@ bool Parser::Parse() //Reg -> Alt, $;
     }
     else
     {
-        errorDesc = "Token cannot be matched";
-        return false;
+        errorDesc = "Expecting EOT";
+        valid = false;
+        return;
     }
     result.print(); //For now parse just prints the tree structure
-    return true;
 }
 
 bool Parser::ParseAlt() //Alt -> Con, {"|", Con};
@@ -34,7 +41,12 @@ bool Parser::ParseAlt() //Alt -> Con, {"|", Con};
     result.createSon('|', Node::ALT);
     //Parsing CON:
     if(ParseCon()) {}
-    else return false;
+    else
+    {
+            errorDesc = "Expecting a concatenation";
+            valid = false;
+            return false;
+    }
     //Checking if next token |, if so, parsing CON again:
     while(checkAlt(scanner.getCurrentToken()))
     {
@@ -43,6 +55,7 @@ bool Parser::ParseAlt() //Alt -> Con, {"|", Con};
         else
         {
             errorDesc = "Cannot match the symbol after |";
+            valid = false;
             return false;
         }
     }
@@ -57,6 +70,7 @@ bool Parser::ParseCon() //Con -> Elem, {Elem};
     else
     {
         errorDesc = "Expecting an element";
+        valid = false;
         return false;
     }
     while(ParseElem()){}
@@ -78,7 +92,6 @@ bool Parser::ParseElem() //Elem -> (symbol, Paren, Set), [op];
     //Trying to parse Set:
     else if(ParseSet()) {}
     else return false;
-
     //Checking if can parse operator:
     if(checkOperator(scanner.getCurrentToken())) //optional
     {
@@ -86,7 +99,6 @@ bool Parser::ParseElem() //Elem -> (symbol, Paren, Set), [op];
         result.goUp();
         scanner.getNextToken();
     }
-
     return true;
 }
 
@@ -103,6 +115,7 @@ bool Parser::ParseParen() //Paren -> "(", Alt, ")";
     else
     {
         errorDesc = "Nothing between ()";
+        valid = false;
         return false;
     }
     //Parsing ):
@@ -113,6 +126,7 @@ bool Parser::ParseParen() //Paren -> "(", Alt, ")";
     else
     {
         errorDesc = "Missing )";
+        valid = false;
         return false;
     }
 
@@ -144,6 +158,7 @@ bool Parser::ParseInter() //Inter -> inset, ["-", inset];
         else
         {
             errorDesc = "Current token does not match any set[] element";
+            valid = false;
             return false;
         }
     }
@@ -179,6 +194,7 @@ bool Parser::ParseSet() //Set -> "[", ["^"], ("]" | Inter), {Inter}, "]";
     else
     {
         errorDesc = "Current token does not match any set[] element";
+        valid = false;
         return false;
     }
     //Parsing set symbols in a loop
@@ -191,6 +207,7 @@ bool Parser::ParseSet() //Set -> "[", ["^"], ("]" | Inter), {Inter}, "]";
     else
     {
         errorDesc = "Current token does not match ] symbol";
+        valid = false;
         return false;
     }
     result.goUp();
@@ -205,6 +222,11 @@ unsigned int Parser::getErrorPos() const
 const std::string& Parser::getErrorDesc() const
 {
     return errorDesc;
+}
+
+bool Parser::getCorrect() const
+{
+    return valid;
 }
 
 //parsing according to the following grammar:

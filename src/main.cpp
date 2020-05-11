@@ -4,9 +4,10 @@
 
 int main()
 {
-    std::string regexp = R"(ab|(ab*)|cx[a-c]\*|ab)";
+    std::string regexp = R"(ab+c|(a?|x))";
     Parser parser(regexp);
-    bool result = parser.Parse();
+    parser.Parse();
+    bool result = parser.getCorrect();
 
     if(result == false)
     {

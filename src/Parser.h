@@ -13,12 +13,17 @@ class Parser
     bool ParseInter();
     bool ParseSet();
 
+    bool valid;
+
     Tree result;
 
 public:
     Parser() = delete;
     Parser(std::string text);
-    bool Parse();
+
+    void Parse();
+
+    bool getCorrect() const;
     unsigned int getErrorPos() const;
     const std::string& getErrorDesc() const;
 };
