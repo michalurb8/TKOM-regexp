@@ -1,14 +1,9 @@
 #include <iostream>
+#include <algorithm>
 #include "Tree.h"
 
-Node::Node()
-:parent(nullptr), valid(false), value(0)
-{
-    children.clear();
-}
-
-Node::Node(Node* parentArg)
-:parent(parentArg), valid(false), value(0)
+Node::Node(char valueArg, nodeType typeArg)
+:value(valueArg), type(typeArg)
 {
     children.clear();
 }
@@ -17,9 +12,10 @@ Node::~Node()
 {
     for(auto ch : children)
     {
-        std::cout << "deleting all children of " << this->value << ": " << ch->value << std::endl;
         delete ch;
+        ch = nullptr;
     }
+    children.clear();
 }
 
 void Node::setParent(Node* parentArg)
@@ -34,31 +30,23 @@ void Node::setKid(Node* kidArg)
 
 
 
-
-
-
-
-
 Tree::Tree()
 {
-    root = new Node();
+    root = new Node('*', Node::REG);
     root->setParent(root);
     current = root;
-    root->value = 'a';
 }
 
 Tree::~Tree()
 {
-    std::cout << "deleting root" << std::endl;
     delete root;
 }
 
-void Tree::addSon()
+void Tree::createSon(char valueArg, Node::nodeType typeArg)
 {
-    Node* son = new Node();
+    Node* son = new Node(valueArg, typeArg);
     son->setParent(current);
     current->setKid(son);
-    son->value = current->value + 1;
     current = son;
 }
 
@@ -67,7 +55,7 @@ Node* Tree::getRoot() const
     return root;
 }
 
-bool Tree::backUp()
+bool Tree::goUp()
 {
     if(current == root)
     {
@@ -80,23 +68,66 @@ bool Tree::backUp()
     }
 }
 
-
-
-
-
-
-void print(const Node* arg, int depth)
+void Tree::reset()
 {
-    for(int i=0; i<depth; ++i)
-    std::cout << " ";
+    current = root;
+    for(auto ch : root->children)
+    {
+        delete ch;
+    }
+    root->children.clear();
+}
+
+void Tree::print()
+{
+    printNode(root, 0);
+}
+
+void Tree::reduce()
+{
+    current = root;
+    reduceNode(root);
+}
+
+
+
+void printNode(const Node* arg, int depth)
+{
+    for(int i=0; i<depth; ++i)  std::cout << "   ";
     std::cout << arg->value << std::endl;
     for(auto ch : arg->children)
     {
-        print(ch, depth + 1);
+        printNode(ch, depth + 1);
     }
 }
 
-void print(const Tree& arg)
+bool reduceNode(Node* arg)
 {
-    print(arg.getRoot(), 0);
+    if(arg->children.size() != 1)
+    {
+        bool repeat = false;
+        do
+        {
+            for(auto ch : arg->children)
+            {
+                repeat = reduceNode(ch);
+                if(repeat) break;
+            }
+        }
+        while(repeat);
+        return false;
+    }
+    if(arg->parent == arg)
+    {
+        return false;
+    }
+    auto position = std::find(arg->parent->children.begin(), arg->parent->children.end(), arg);
+    *position = arg->children[0];
+
+    arg->children[0]->parent = arg->parent;
+
+    arg->children.clear();
+    delete arg;
+    arg = nullptr;
+    return true;
 }

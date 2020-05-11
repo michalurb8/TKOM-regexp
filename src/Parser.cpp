@@ -1,75 +1,113 @@
 #include "Parser.h"
-#include <iostream> //to be removed
 
 Parser::Parser(std::string text)
 :errorDesc(""), scanner(text)
 {
 }
 
-bool Parser::Parse()
+bool Parser::Parse() //Reg -> Alt, $;
 {
-    errorDesc="";
+    result.reset();
+    errorDesc = "";
     scanner.getNextToken();
-    if(!ParseAlt()) return false;
-    if(!checkEOT(scanner.getCurrentToken())) return false;
-    std::cout << "eot" << std::endl;
+
+    //Parsing ALT:
+    if(ParseAlt()) {}
+    else return false;
+    //Parsing $:
+    if(checkEOT(scanner.getCurrentToken()))
+    {
+        result.createSon('$', Node::END);
+        result.goUp();
+    }
+    else
+    {
+        errorDesc = "Token cannot be matched";
+        return false;
+    }
+    result.print(); //For now parse just prints the tree structure
     return true;
 }
 
-bool Parser::ParseAlt()
+bool Parser::ParseAlt() //Alt -> Con, {"|", Con};
 {
-    if(!ParseCon()) return false;
+    result.createSon('|', Node::ALT);
+    //Parsing CON:
+    if(ParseCon()) {}
+    else return false;
+    //Checking if next token |, if so, parsing CON again:
     while(checkAlt(scanner.getCurrentToken()))
     {
         scanner.getNextToken();
-        //parsing alternative sign here
-        std::cout << '|' << std::endl;
-        if(!ParseCon()) return false;
+        if(ParseCon()) {}
+        else
+        {
+            errorDesc = "Cannot match the symbol after |";
+            return false;
+        }
     }
-   return true;
-}
-
-bool Parser::ParseCon()
-{
-    if(!ParseElem()) return false;
-    while(ParseElem()){}
+    result.goUp();
     return true;
 }
 
-bool Parser::ParseElem()
+bool Parser::ParseCon() //Con -> Elem, {Elem};
 {
+    result.createSon('*', Node::CON);
+    if(ParseElem()) {}
+    else
+    {
+        errorDesc = "Expecting an element";
+        return false;
+    }
+    while(ParseElem()){}
+    result.goUp();
+    return true;
+}
+
+bool Parser::ParseElem() //Elem -> (symbol, Paren, Set), [op];
+{
+    //Trying to parse symbol:
     if(checkSymbol(scanner.getCurrentToken()))
     {
-        //parsing single symbol here TODO
-        std::cout << scanner.getCurrentToken().value << std::endl;
+        result.createSon(scanner.getCurrentToken().value, Node::SYMBOL);
+        result.goUp();
         scanner.getNextToken();
     }
+    //Trying to parse Paren:
     else if(ParseParen()) {}
+    //Trying to parse Set:
     else if(ParseSet()) {}
     else return false;
-    if(checkOperator(scanner.getCurrentToken()))
+
+    //Checking if can parse operator:
+    if(checkOperator(scanner.getCurrentToken())) //optional
     {
-        //parsing operator here TODO
-        std::cout << "op " << scanner.getCurrentToken().value << std::endl;
+        result.createSon(scanner.getCurrentToken().value, Node::OP);
+        result.goUp();
         scanner.getNextToken();
     }
+
     return true;
 }
 
-bool Parser::ParseParen()
+bool Parser::ParseParen() //Paren -> "(", Alt, ")";
 {
+    //Checking if can parse (:
     if(checkLParen(scanner.getCurrentToken()))
     {
-        //parsing Lparen here TODO
-        std::cout << "paren" << scanner.getCurrentToken().value << std::endl;
         scanner.getNextToken();
     }
     else return false;
-    ParseAlt();
+    //Parsing ALT:
+    if(ParseAlt()) {}
+    else
+    {
+        errorDesc = "Nothing between ()";
+        return false;
+    }
+    //Parsing ):
     if(checkRParen(scanner.getCurrentToken()))
     {
-        std::cout << "paren" << scanner.getCurrentToken().value << std::endl;
-        //parsing Rparen here TODO
         scanner.getNextToken();
     }
     else
@@ -77,27 +115,30 @@ bool Parser::ParseParen()
         errorDesc = "Missing )";
         return false;
     }
+
     return true;
 }
 
-bool Parser::ParseInter()
+bool Parser::ParseInter() //Inter -> inset, ["-", inset];
 {
+    //Parsing first element of interval:
     if(checkInBrackets(scanner.getCurrentToken()))
     {
-        std::cout << scanner.getCurrentToken().value << std::endl;
-        //parsing first inbracket here TODO
+        result.createSon('I', Node::INTER);
+        result.createSon(scanner.getCurrentToken().value, Node::INSET);
+        result.goUp();
         scanner.getNextToken();
     }
     else return false;
+    //Checking if it is a set (- sign):
     if(checkInterval(scanner.getCurrentToken()))
     {
-        std::cout << "interval" << scanner.getCurrentToken().value << std::endl;
-        //parsing interval here TODO
         scanner.getNextToken();
+        //if so, parsing second element:
         if(checkInBrackets(scanner.getCurrentToken()))
         {
-            std::cout << scanner.getCurrentToken().value << std::endl;
-            //parsing second inbracket here TODO
+            result.createSon(scanner.getCurrentToken().value, Node::INSET);
+            result.goUp();
             scanner.getNextToken();
         }
         else
@@ -106,42 +147,45 @@ bool Parser::ParseInter()
             return false;
         }
     }
+    result.goUp();
     return true;
 }
 
-bool Parser::ParseSet()
+bool Parser::ParseSet() //Set -> "[", ["^"], ("]" | Inter), {Inter}, "]";
 {
-
+    //trying to parse first bracket:
     if(checkLBracket(scanner.getCurrentToken()))
     {
-        std::cout << "bracket" << scanner.getCurrentToken().value << std::endl;
-        //parsing lB here TODO
+        result.createSon('[', Node::SET);
         scanner.getNextToken();
     }
     else return false;
+    //trying to parse caret (optional):
     if(checkCaret(scanner.getCurrentToken()))
     {
-        std::cout << "caret" << scanner.getCurrentToken().value << std::endl;
-        //parsing caret here TODO
-        scanner.getNextToken();
-    } //optional
-    if(checkRBracket(scanner.getCurrentToken()))
-    {
-        std::cout << "rbrack" << scanner.getCurrentToken().value << std::endl;
-        //parsing rbrack here TODO
+        result.createSon('^', Node::CARET);
+        result.goUp();
         scanner.getNextToken();
     }
+    //trying to parse right bracket as an element
+    if(checkRBracket(scanner.getCurrentToken()))
+    {
+        result.createSon(']', Node::INSET);
+        result.goUp();
+        scanner.getNextToken();
+    }
+    //otherwise parsing a set symbol
     else if(ParseInter()) {}
     else
     {
         errorDesc = "Current token does not match any set[] element";
         return false;
     }
+    //Parsing set symbols in a loop
     while(ParseInter()){}
+    //Parsing the right bracket
     if(checkRBracket(scanner.getCurrentToken()))
     {
-        std::cout << "bracket" << scanner.getCurrentToken().value << std::endl;
-        //parsing rB here TODO
         scanner.getNextToken();
     }
     else
@@ -149,6 +193,7 @@ bool Parser::ParseSet()
         errorDesc = "Current token does not match ] symbol";
         return false;
     }
+    result.goUp();
     return true;
 }
 
@@ -162,10 +207,9 @@ const std::string& Parser::getErrorDesc() const
     return errorDesc;
 }
 
-
-//done according to the following grammar:
+//parsing according to the following grammar:
 /*
-    Reg -> Alt;
+    Reg -> Alt, $;
     Alt -> Con, {"|", Con};
     Con -> Elem, {Elem};
     Elem -> (symbol, Paren, Set), [op];
@@ -173,7 +217,7 @@ const std::string& Parser::getErrorDesc() const
     Set -> "[", ["^"], ("]" | Inter), {Inter}, "]";
     Inter -> inset, ["-", inset];
 
-    symbol -> ?all escaped? + ")" + "]" + "." + "^" + "$" + "-";
+    symbol -> ?all escaped? + "]" + "." + "^" + "$" + "-";
     inset -> ?all? - "-" - "]";
     op -> "*", "+", "?";
 */

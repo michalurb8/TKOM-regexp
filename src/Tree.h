@@ -1,16 +1,17 @@
 #pragma once
-#include <ostream>
 #include <vector>
 
 struct Node
 {
+    enum nodeType {SYMBOL, REG, ALT, CON, PAREN, INTER, INSET, SET, OP, END, CARET};
+
     Node* parent;
     std::vector<Node*> children;
-    bool valid;
     char value;
+    nodeType type;
 
-    Node();
-    Node(Node* parentArg);
+    Node() = delete;
+    Node(char valueArg, nodeType typeArg);
     Node(const Node& arg) = delete;
     Node operator=(const Node& arg) = delete;
     ~Node();
@@ -23,21 +24,23 @@ class Tree
 {
     Node* root;
     Node* current;
+    Node* getRoot() const;
+    bool valid;
 
 public:
     Tree();
-    Tree(Node* rootArg);
     Tree(const Tree& arg) = delete;
     Tree operator=(const Tree& arg) = delete;
     ~Tree();
 
-    void addSon();
-    Node* getRoot() const;
-    bool backUp();
+    void createSon(char valueArg, Node::nodeType typeArg);
+    bool goUp();
 
-    friend void print(const Tree& arg);
+    void reset();
+    void reduce();
+
+    void print();
 };
 
-void print(const Node* arg, int depth);
-
-void print(const Tree& arg);
+void printNode(const Node* arg, int depth);
+bool reduceNode(Node* arg);

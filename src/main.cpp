@@ -4,13 +4,16 @@
 
 int main()
 {
-    Tree a;
-    print(a);
-    /*
-    std::string regexp = R"(a*b|b*c(a))";
+    std::string regexp = R"(ab|(ab*)|cx[a-c]\*|ab)";
     Parser parser(regexp);
-    std::cout << (parser.Parse() ? "success" : "fail") << std::endl;
-    */
+    bool result = parser.Parse();
+
+    if(result == false)
+    {
+        std::cout << "An error occured:" << std::endl;
+        std::cout << parser.getErrorDesc() << std::endl;
+        std::cout << "On position: " << parser.getErrorPos() << std::endl;
+    }
 
     return 0;
 }

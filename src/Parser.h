@@ -1,5 +1,7 @@
 #pragma once
 #include "Scanner.h"
+#include "Tree.h"
+
 class Parser
 {
     std::string errorDesc;
@@ -10,6 +12,8 @@ class Parser
     bool ParseParen();
     bool ParseInter();
     bool ParseSet();
+
+    Tree result;
 
 public:
     Parser() = delete;

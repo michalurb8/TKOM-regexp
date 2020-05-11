@@ -42,9 +42,9 @@ bool checkSymbol(const Token& arg)
     if(arg.escaped == true) return true;
     switch(arg.value)
     {
-        case '(': case '[':
+        case '(': case '[': case ')':
         case '*': case '+': case '?':
-        case '-': case '|':
+        case '|':
         case 0x03:
         return false;
     }
