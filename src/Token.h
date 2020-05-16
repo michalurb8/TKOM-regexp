@@ -21,5 +21,5 @@ bool checkRParen(const Token& arg);
 bool checkLBracket(const Token& arg);
 bool checkRBracket(const Token& arg);
 bool checkCaret(const Token& arg);
-bool checkInterval(const Token& arg);
+bool checkDash(const Token& arg);
 bool checkEOT(const Token& arg);

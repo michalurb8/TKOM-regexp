@@ -1,9 +1,16 @@
 #include <iostream>
 #include <algorithm>
+#include <cstring>
 #include "Node.h"
 
+Node::Node()
+:value(0x03), type(Node::NONE), left(nullptr), right(nullptr), parent(nullptr)
+{
+
+}
+
 Node::Node(char valueArg, nodeType typeArg)
-:value(valueArg), type(typeArg), left(nullptr), right(nullptr)
+:value(valueArg), type(typeArg), left(nullptr), right(nullptr), parent(nullptr)
 {
 }
 
@@ -48,23 +55,35 @@ void printTree(const Node* arg)
 
 NodeSet::NodeSet(char valueArg, nodeType typeArg)
 {
-
-}
-
-void NodeSet::setZero()
-{
-    for(short i = 0; i < 16; ++i) map[i] = 0;
+    value = valueArg;
+    type = typeArg;
+    for(short i = 0; i < 8; ++i) map[i] = 0;
 }
 
 void NodeSet::addChar(unsigned char arg)
 {
     uint8_t ascii = arg;
-    map[arg/16] = map[arg/16] | (1 >> arg%8);
+    map[arg/16] = map[arg/16] | (1 << (15-arg%16));
 }
 
 void NodeSet::addChars(unsigned char beg, unsigned char end)
 {
-
     uint8_t asciib = beg;
     uint8_t asciie = end;
+    for(short i = asciib; i <= asciie; ++i)
+    {
+        map[i/16] = map[i/16] | (1 << (15-i%16));
+    }
+}
+
+void printNode(const NodeSet* a)
+{
+    for(short i=0; i<8; ++i)
+    {
+        for(short j=15; j>=0; --j)
+        {
+            std::cout << (a->map[i] >> j)%2;
+        }
+        std::cout << std::endl;
+    }
 }

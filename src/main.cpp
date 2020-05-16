@@ -6,7 +6,11 @@
 int main()
 {
     Node* a = new NodeSet('a', Node::PAREN);
-    a.
+    NodeSet* b = (NodeSet*)a;
+    b->addChar('a');
+    b->addChars('c', 'o');
+    b->addChar('q');
+    printNode(b);
 
 
     return 0;

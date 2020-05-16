@@ -96,7 +96,7 @@ bool checkCaret(const Token& arg)
     return false;
 }
 
-bool checkInterval(const Token& arg)
+bool checkDash(const Token& arg)
 {
     if(arg.value == '-' && arg.escaped == false) return true;
     return false;

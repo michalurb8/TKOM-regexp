@@ -105,21 +105,24 @@ Node* Parser::ParseParen() //Paren -> "(", Alt, ")";
 
 void Parser::ParseInter()//(charMap& arg) //Inter -> inset, ["-", inset];
 {
-    Node* interval;
     //Parsing first element of interval:
-    if(checkInBrackets(scanner.getCurrentToken())) accept();
+    if(checkInBrackets(scanner.getCurrentToken()))
+    {
+        accept();
+        //TODO
+    }
     else return;
-    //Checking if it is a set (- sign):
-    if(checkInterval(scanner.getCurrentToken()))
+    //checking for a - sign:
+    if(checkDash(scanner.getCurrentToken()))
     {
         accept();
         //if so, parsing second element:
-        if(checkInBrackets(scanner.getCurrentToken())) accept();
-        else
+        if(checkInBrackets(scanner.getCurrentToken()))
         {
-            errorDesc = "Current token does not match any set[] element";
-            //return false;
+            accept();
+            //TODO
         }
+        else throw "'-' must be followed by a symbol";
     }
     return;
 }
