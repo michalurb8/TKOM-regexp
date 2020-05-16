@@ -1,27 +1,28 @@
 #pragma once
 #include "Scanner.h"
-#include "Tree.h"
+#include "Node.h"
 
 class Parser
 {
     std::string errorDesc;
     Scanner scanner;
-    bool ParseAlt();
-    bool ParseCon();
-    bool ParseElem();
-    bool ParseParen();
-    bool ParseInter();
-    bool ParseSet();
+    Node* ParseAlt();
+    Node* ParseCon();
+    Node* ParseElem();
+    Node* ParseParen();
+    void ParseInter();
+    Node* ParseSet();
+    Node* ParseSymbol();
+    Node* ParseOp(Node* arg);
 
     bool valid;
-
-    Tree result;
 
 public:
     Parser() = delete;
     Parser(std::string text);
 
-    void Parse();
+    Node* Parse();
+    void accept();
 
     bool getCorrect() const;
     unsigned int getErrorPos() const;

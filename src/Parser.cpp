@@ -2,216 +2,208 @@
 #include <iostream>
 
 Parser::Parser(std::string text)
-:errorDesc(""), scanner(text), valid(true)
+:errorDesc(""), scanner(text), valid(false)
 {
 }
 
-void Parser::Parse() //Reg -> Alt, $;
+Node* Parser::Parse() //Reg -> Alt, $;
 {
-    result.reset();
-    errorDesc = "";
-    scanner.getNextToken();
-    valid = true;
+    accept();
+    Node* root = nullptr;
+    valid = false;
 
     //Parsing ALT:
-    if(ParseAlt()) {}
-    else
-    {
-        errorDesc = "Empty expression";
-        valid = false;
-        return;
-    }
+    Node* alt = ParseAlt();
+    if(alt == nullptr) throw "No expression detected.";
+
     //Parsing $:
     if(checkEOT(scanner.getCurrentToken()))
     {
-        result.createSon('$', Node::END);
-        result.goUp();
+        Node* eot = new Node('E', Node::END);
+        root = new Node(alt, eot, 'R', Node::CON);
     }
-    else
-    {
-        errorDesc = "Expecting EOT";
-        valid = false;
-        return;
-    }
-    result.print(); //For now parse just prints the tree structure
+    else throw "Expecting EOT";
+
+    valid = true;
+    return root;
 }
 
-bool Parser::ParseAlt() //Alt -> Con, {"|", Con};
+Node* Parser::ParseAlt() //Alt -> Con, {"|", Con};
 {
-    result.createSon('|', Node::ALT);
+    Node* leftAlt = nullptr;
+
     //Parsing CON:
-    if(ParseCon()) {}
-    else
-    {
-            errorDesc = "Expecting a concatenation";
-            valid = false;
-            return false;
-    }
+    leftAlt = ParseCon();
+    if(leftAlt == nullptr) throw "Alternative should start with concatenation";
+
     //Checking if next token |, if so, parsing CON again:
     while(checkAlt(scanner.getCurrentToken()))
     {
-        scanner.getNextToken();
-        if(ParseCon()) {}
-        else
-        {
-            errorDesc = "Cannot match the symbol after |";
-            valid = false;
-            return false;
-        }
+        accept();
+        Node* rightAlt = ParseCon();
+        if(rightAlt == nullptr) throw "No concatenation after alternative sign";
+        leftAlt = new Node(leftAlt, rightAlt, '|', Node::ALT);
     }
-    result.goUp();
-    return true;
+
+
+    return leftAlt;
 }
 
-bool Parser::ParseCon() //Con -> Elem, {Elem};
+Node* Parser::ParseCon() //Con -> Elem, {Elem};
 {
-    result.createSon('*', Node::CON);
-    if(ParseElem()) {}
-    else
+    Node* leftCon = nullptr;
+    
+    //Parsing element:
+    leftCon = ParseElem();
+    if(leftCon == nullptr) throw "A concatenation should start with an element";
+
+    //Parsing concatenated elements:
+    Node* rightCon = nullptr;
+    while((rightCon = ParseElem()) != nullptr)
     {
-        errorDesc = "Expecting an element";
-        valid = false;
-        return false;
+        leftCon = new Node(leftCon, rightCon, '*', Node::CON);
     }
-    while(ParseElem()){}
-    result.goUp();
-    return true;
+
+    return leftCon;
 }
 
-bool Parser::ParseElem() //Elem -> (symbol, Paren, Set), [op];
+Node* Parser::ParseElem() //Elem -> (symbol, Paren, Set), [op];
 {
-    //Trying to parse symbol:
-    if(checkSymbol(scanner.getCurrentToken()))
-    {
-        result.createSon(scanner.getCurrentToken().value, Node::SYMBOL);
-        result.goUp();
-        scanner.getNextToken();
-    }
-    //Trying to parse Paren:
-    else if(ParseParen()) {}
-    //Trying to parse Set:
-    else if(ParseSet()) {}
-    else return false;
-    //Checking if can parse operator:
-    if(checkOperator(scanner.getCurrentToken())) //optional
-    {
-        result.createSon(scanner.getCurrentToken().value, Node::OP);
-        result.goUp();
-        scanner.getNextToken();
-    }
-    return true;
+    Node* elem = nullptr;
+    //Parsing symbol:
+    elem = ParseSymbol();
+    //Parsing paren:
+    if(elem == nullptr) elem = ParseParen();
+    //Parsing set:
+    if(elem == nullptr) elem = ParseSet();
+    if(elem == nullptr) return nullptr;
+
+    //Parsing operator:
+    elem = ParseOp(elem);
+
+    return elem;
 }
 
-bool Parser::ParseParen() //Paren -> "(", Alt, ")";
+Node* Parser::ParseParen() //Paren -> "(", Alt, ")";
 {
-    //Checking if can parse (:
-    if(checkLParen(scanner.getCurrentToken()))
-    {
-        scanner.getNextToken();
-    }
-    else return false;
+    Node* paren = nullptr;
+
+    //Parsing (:
+    if(checkLParen(scanner.getCurrentToken())) accept();
+    else return nullptr;
+
     //Parsing ALT:
-    if(ParseAlt()) {}
-    else
-    {
-        errorDesc = "Nothing between ()";
-        valid = false;
-        return false;
-    }
-    //Parsing ):
-    if(checkRParen(scanner.getCurrentToken()))
-    {
-        scanner.getNextToken();
-    }
-    else
-    {
-        errorDesc = "Missing )";
-        valid = false;
-        return false;
-    }
+    paren = ParseAlt();
+    if(paren == nullptr) throw "There must be an alternative inside ()";
 
-    return true;
+    //Parsing ):
+    if(checkRParen(scanner.getCurrentToken())) accept();
+    else throw "No closing bracket";
+
+    return paren;
 }
 
-bool Parser::ParseInter() //Inter -> inset, ["-", inset];
+void Parser::ParseInter()//(charMap& arg) //Inter -> inset, ["-", inset];
 {
+    Node* interval;
     //Parsing first element of interval:
-    if(checkInBrackets(scanner.getCurrentToken()))
-    {
-        result.createSon('I', Node::INTER);
-        result.createSon(scanner.getCurrentToken().value, Node::INSET);
-        result.goUp();
-        scanner.getNextToken();
-    }
-    else return false;
+    if(checkInBrackets(scanner.getCurrentToken())) accept();
+    else return;
     //Checking if it is a set (- sign):
     if(checkInterval(scanner.getCurrentToken()))
     {
-        scanner.getNextToken();
+        accept();
         //if so, parsing second element:
-        if(checkInBrackets(scanner.getCurrentToken()))
-        {
-            result.createSon(scanner.getCurrentToken().value, Node::INSET);
-            result.goUp();
-            scanner.getNextToken();
-        }
+        if(checkInBrackets(scanner.getCurrentToken())) accept();
         else
         {
             errorDesc = "Current token does not match any set[] element";
-            valid = false;
-            return false;
+            //return false;
         }
     }
-    result.goUp();
-    return true;
+    return;
 }
 
-bool Parser::ParseSet() //Set -> "[", ["^"], ("]" | Inter), {Inter}, "]";
+Node* Parser::ParseSet() //Set -> "[", ["^"], ("]" | Inter), {Inter}, "]";
 {
+    Node* set = nullptr;
+    bool caret = false;
+    bool RBracet = false;
     //trying to parse first bracket:
-    if(checkLBracket(scanner.getCurrentToken()))
-    {
-        result.createSon('[', Node::SET);
-        scanner.getNextToken();
-    }
-    else return false;
+    if(checkLBracket(scanner.getCurrentToken())) accept();
+    else return nullptr;
     //trying to parse caret (optional):
     if(checkCaret(scanner.getCurrentToken()))
     {
-        result.createSon('^', Node::CARET);
-        result.goUp();
-        scanner.getNextToken();
+        accept();
+        caret = true;
     }
     //trying to parse right bracket as an element
     if(checkRBracket(scanner.getCurrentToken()))
     {
-        result.createSon(']', Node::INSET);
-        result.goUp();
-        scanner.getNextToken();
+        accept();
+        RBracet = true;
     }
     //otherwise parsing a set symbol
-    else if(ParseInter()) {}
     else
     {
-        errorDesc = "Current token does not match any set[] element";
-        valid = false;
-        return false;
+        return set;
+    }
+    if(true) {}
+    else throw  "ABC";
+    {
+        errorDesc = "[] cannot be empty";
+        //return false;
     }
     //Parsing set symbols in a loop
-    while(ParseInter()){}
+    //while(ParseInter()){}
     //Parsing the right bracket
     if(checkRBracket(scanner.getCurrentToken()))
     {
-        scanner.getNextToken();
+        accept();
     }
     else
     {
         errorDesc = "Current token does not match ] symbol";
-        valid = false;
-        return false;
+        //return false;
     }
-    result.goUp();
-    return true;
+    return nullptr;
+}
+
+Node* Parser::ParseSymbol()
+{
+    Node* symbol = nullptr;
+    if(checkSymbol(scanner.getCurrentToken()))
+    {
+        symbol = new Node(scanner.getCurrentToken().value, Node::SYMBOL);
+        accept();
+    }
+    return symbol;
+}
+
+Node* Parser::ParseOp(Node* arg)
+{
+    Node* op = nullptr;
+    if(checkOperator(scanner.getCurrentToken()))
+    {
+        switch(scanner.getCurrentToken().value)
+        {
+            case '*':
+                op = new Node(arg, nullptr, '*', Node::KLEENE);
+                break;
+            case '+':
+                op = new Node(arg, nullptr, '+', Node::PLUS);
+                break;
+            case '?':
+                op = new Node(arg, nullptr, '?', Node::OPTIONAL);
+                break;
+            default:
+                throw "Wrong operator";
+        }
+        accept();
+    }
+    else op = arg;
+    return op;
 }
 
 unsigned int Parser::getErrorPos() const
@@ -227,6 +219,11 @@ const std::string& Parser::getErrorDesc() const
 bool Parser::getCorrect() const
 {
     return valid;
+}
+
+void Parser::accept()
+{
+    scanner.getNextToken();
 }
 
 //parsing according to the following grammar:
