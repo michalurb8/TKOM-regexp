@@ -5,7 +5,7 @@
 int main()
 {
     std::string regexp = R"(ab+c|(a?|x[a5-9]))";
-    regexp = R"(b+|(a?(abc)|a*|dupa|[a-c]*abc)";
+    regexp = R"(b+|(a?(abc)|a*|wxyz|[a-c]*ab)c)";
     Parser parser(regexp);
     Node* temp;
     try
