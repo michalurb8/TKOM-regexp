@@ -3,14 +3,16 @@
 
 struct Node
 {
+protected:
+    Node* left;
+    Node* right;
+    Node* parent;
+    Node();
+public:
     enum nodeType {SYMBOL, NONE, ALT, CON, PAREN, INTER, INSET, SET, KLEENE, OPTIONAL, PLUS, END, CARET};
 
     char value;
     nodeType type;
-
-    Node* left;
-    Node* right;
-    Node* parent;
 
     Node(char valueArg, nodeType typeArg);
     Node(Node* left, Node* right, char valueArg, nodeType typeArg);
@@ -18,14 +20,14 @@ struct Node
     Node operator=(const Node& arg) = delete;
     ~Node();
 
-protected:
-    Node();
+friend void printNode(const Node* arg, int depth);
+
 };
 
 struct NodeSet : public Node
 {
-    NodeSet(char valueArg, nodeType typeArg);
     uint16_t map[8];
+    NodeSet(char valueArg, nodeType typeArg);
     void addChar(unsigned char arg);
     void addChars(unsigned char beg, unsigned  char end);
 };
