@@ -9,7 +9,7 @@ protected:
     Node* parent;
     Node();
 public:
-    enum nodeType {SYMBOL, NONE, ALT, CON, PAREN, INTER, INSET, SET, KLEENE, OPTIONAL, PLUS, END, CARET};
+    enum nodeType {SYMBOL, NONE, ALT, CON, SET, KLEENE, OPTIONAL, PLUS, END};
 
     char value;
     nodeType type;
@@ -21,7 +21,6 @@ public:
     ~Node();
 
 friend void printNode(const Node* arg, int depth);
-
 };
 
 struct NodeSet : public Node

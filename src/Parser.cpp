@@ -45,7 +45,6 @@ Node* Parser::ParseAlt() //Alt -> Con, {"|", Con};
         leftAlt = new Node(leftAlt, rightAlt, '|', Node::ALT);
     }
 
-
     return leftAlt;
 }
 
@@ -129,8 +128,6 @@ bool Parser::ParseInSet(NodeSet* arg)//(charMap& arg) //Inter -> inset, ["-", in
         arg->addChars(first, second);
     }
     else arg->addChar(first);
-
-    std::cout << first << " " << second << std::endl;
     return true;
 }
 
