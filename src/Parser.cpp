@@ -20,7 +20,7 @@ Node* Parser::Parse() //Reg -> Alt, $;
     if(checkEOT(scanner.getCurrentToken()))
     {
         Node* eot = new Node('E', Node::END);
-        root = new Node(alt, eot, 'R', Node::CON);
+        root = new Node(alt, eot, '*', Node::CON);
     }
     else throw "Expecting EOT";
 
@@ -103,74 +103,66 @@ Node* Parser::ParseParen() //Paren -> "(", Alt, ")";
     return paren;
 }
 
-void Parser::ParseInter()//(charMap& arg) //Inter -> inset, ["-", inset];
+bool Parser::ParseInSet(NodeSet* arg)//(charMap& arg) //Inter -> inset, ["-", inset];
 {
+    unsigned char first = 5;
+    unsigned char second = 10;
     //Parsing first element of interval:
-    if(checkInBrackets(scanner.getCurrentToken()))
+    if(checkInSet(scanner.getCurrentToken()))
     {
+        first = scanner.getCurrentToken().value;
         accept();
-        //TODO
     }
-    else return;
-    //checking for a - sign:
+    else return false;
+
+    //checking if - is next:
     if(checkDash(scanner.getCurrentToken()))
     {
         accept();
         //if so, parsing second element:
-        if(checkInBrackets(scanner.getCurrentToken()))
+        if(checkInSet(scanner.getCurrentToken()))
         {
+            second = scanner.getCurrentToken().value;
             accept();
-            //TODO
         }
         else throw "'-' must be followed by a symbol";
+        arg->addChars(first, second);
     }
-    return;
+    else arg->addChar(first);
+
+    std::cout << first << " " << second << std::endl;
+    return true;
 }
 
-Node* Parser::ParseSet() //Set -> "[", ["^"], ("]" | Inter), {Inter}, "]";
+Node* Parser::ParseSet() //Set -> "[", ["^"], ("]" | InSet), {InSet}, "]";
 {
-    Node* set = nullptr;
-    bool caret = false;
-    bool RBracet = false;
-    //trying to parse first bracket:
+    //Parse [:
     if(checkLBracket(scanner.getCurrentToken())) accept();
     else return nullptr;
-    //trying to parse caret (optional):
+
+    NodeSet* set = new NodeSet();
+    //Parse ^ (optional)
     if(checkCaret(scanner.getCurrentToken()))
     {
         accept();
-        caret = true;
+        set->caret = true;
     }
-    //trying to parse right bracket as an element
+    //Parse ] as an element
     if(checkRBracket(scanner.getCurrentToken()))
     {
         accept();
-        RBracet = true;
+        set->RBracket = true;
     }
-    //otherwise parsing a set symbol
-    else
-    {
-        return set;
-    }
-    if(true) {}
-    else throw  "ABC";
-    {
-        errorDesc = "[] cannot be empty";
-        //return false;
-    }
-    //Parsing set symbols in a loop
-    //while(ParseInter()){}
-    //Parsing the right bracket
-    if(checkRBracket(scanner.getCurrentToken()))
-    {
-        accept();
-    }
-    else
-    {
-        errorDesc = "Current token does not match ] symbol";
-        //return false;
-    }
-    return nullptr;
+    else if(!ParseInSet(set)) throw "Set cannot be empty []";
+    
+    //Parse set symbols in a loop:
+    while(ParseInSet(set)) {}
+
+    //Parse ]:
+    if(checkRBracket(scanner.getCurrentToken())) accept();
+    else throw "Expecting a ] symbol";
+
+    return set;
 }
 
 Node* Parser::ParseSymbol()

@@ -51,7 +51,7 @@ bool checkSymbol(const Token& arg)
     return true;
 }
 
-bool checkInBrackets(const Token& arg)
+bool checkInSet(const Token& arg)
 {
     if(arg.escaped == true) return true;
     if(arg.value == 0x03) return false;

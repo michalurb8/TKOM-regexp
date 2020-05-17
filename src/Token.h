@@ -14,7 +14,7 @@ void print(Token arg);          //for debugging
 bool checktest(const Token& arg);
 bool checkOperator(const Token& arg);
 bool checkSymbol(const Token& arg);
-bool checkInBrackets(const Token& arg);
+bool checkInSet(const Token& arg);
 bool checkAlt(const Token& arg);
 bool checkLParen(const Token& arg);
 bool checkRParen(const Token& arg);

@@ -10,7 +10,7 @@ class Parser
     Node* ParseCon();
     Node* ParseElem();
     Node* ParseParen();
-    void ParseInter();
+    bool ParseInSet(NodeSet* arg);
     Node* ParseSet();
     Node* ParseSymbol();
     Node* ParseOp(Node* arg);

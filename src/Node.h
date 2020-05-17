@@ -27,11 +27,13 @@ friend void printNode(const Node* arg, int depth);
 struct NodeSet : public Node
 {
     uint16_t map[8];
-    NodeSet(char valueArg, nodeType typeArg);
+    bool caret;
+    bool RBracket;
+    NodeSet();
     void addChar(unsigned char arg);
     void addChars(unsigned char beg, unsigned  char end);
 };
 
 void printNode(const Node* arg, int depth);
-void printNode(const NodeSet* a);
+void printSet(const NodeSet* a);
 void printTree(const Node* arg);

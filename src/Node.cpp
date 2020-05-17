@@ -6,7 +6,6 @@
 Node::Node()
 :value(0x03), type(Node::NONE), left(nullptr), right(nullptr), parent(nullptr)
 {
-
 }
 
 Node::Node(char valueArg, nodeType typeArg)
@@ -35,7 +34,8 @@ Node::~Node()
 void printNode(const Node* arg, int depth)
 {
     for(int i=0; i<depth; ++i)  std::cout << "   ";
-    std::cout << arg->value << std::endl;
+    if(arg->type == Node::SET) printSet((NodeSet*)arg);
+    else std::cout << arg->value << std::endl;
     if(arg->left)
         printNode(arg->left, depth + 1);
     if(arg->right)
@@ -50,13 +50,11 @@ void printTree(const Node* arg)
 
 
 
-
-
-
-NodeSet::NodeSet(char valueArg, nodeType typeArg)
+NodeSet::NodeSet()
+:caret(false), RBracket(false)
 {
-    value = valueArg;
-    type = typeArg;
+    value = 'S';
+    type = Node::SET;
     for(short i = 0; i < 8; ++i) map[i] = 0;
 }
 
@@ -76,7 +74,7 @@ void NodeSet::addChars(unsigned char beg, unsigned char end)
     }
 }
 
-void printNode(const NodeSet* a)
+void printSet(const NodeSet* a)
 {
     for(short i=0; i<8; ++i)
     {
