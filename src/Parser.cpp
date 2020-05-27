@@ -36,7 +36,7 @@ upNode Parser::ParseAlt() //Alt -> Con, {"|", Con};
     leftAlt = ParseCon();
     if(leftAlt == nullptr) throw "Alternative should start with concatenation";
 
-    //Checking if next token |, if so, parsing CON again:
+    //Checking if next token is |, if so, parsing CON again:
     while(checkAlt(scanner.getCurrentToken()))
     {
         accept();
@@ -79,7 +79,6 @@ upNode Parser::ParseElem() //Elem -> (symbol, Paren, Set), [op];
 
     //Parsing operator:
     upNode op = ParseOp(elem);
-
 }
 
 upNode Parser::ParseParen() //Paren -> "(", Alt, ")";
