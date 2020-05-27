@@ -1,38 +1,64 @@
 #pragma once
+#include <memory>
 #include <vector>
+#include <set>
+
 
 struct Node
 {
+private:
+    std::unique_ptr<Node> left;
+    std::unique_ptr<Node> right;
+
 protected:
-    Node* left;
-    Node* right;
-    Node* parent;
     Node();
+
 public:
-    enum nodeType {SYMBOL, NONE, ALT, CON, SET, KLEENE, OPTIONAL, PLUS, END};
-
-    char value;
-    nodeType type;
-
-    Node(char valueArg, nodeType typeArg);
-    Node(Node* left, Node* right, char valueArg, nodeType typeArg);
     Node(const Node& arg) = delete;
     Node operator=(const Node& arg) = delete;
     ~Node();
-
-friend void printNode(const Node* arg, int depth);
 };
 
-struct NodeSet : public Node
+typedef std::unique_ptr<Node> upNode;
+
+struct SymbolNode : public Node
 {
-    uint16_t map[8];
-    bool caret;
-    bool RBracket;
-    NodeSet();
-    void addChar(unsigned char arg);
-    void addChars(unsigned char beg, unsigned  char end);
+    char value;
+    SymbolNode(char arg);
 };
 
-void printNode(const Node* arg, int depth);
-void printSet(const NodeSet* a);
-void printTree(const Node* arg);
+struct AltNode : public Node
+{
+    AltNode(upNode left, upNode right);
+};
+
+struct ConNode : public Node
+{
+    ConNode(upNode left, upNode right);
+};
+
+struct PlusNode : public Node
+{
+    PlusNode(upNode down);
+};
+
+struct OptionalNode : public Node
+{
+    OptionalNode(upNode down);
+};
+
+struct KleeneNode : public Node
+{
+    KleeneNode(upNode down);
+};
+
+struct SetNode : public Node
+{
+    std::set<char> chars;
+    SetNode(/* jakis wektor */);
+};
+
+struct NegativeSetNode : public SetNode
+{
+    //to samo tylko odwrotnie 
+};

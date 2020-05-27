@@ -6,21 +6,21 @@ Parser::Parser(std::string text)
 {
 }
 
-Node* Parser::Parse() //Reg -> Alt, $;
+upNode Parser::Parse() //Reg -> Alt, $;
 {
     accept();
-    Node* root = nullptr;
+    upNode root = nullptr;
     valid = false;
 
     //Parsing ALT:
-    Node* alt = ParseAlt();
+    upNode alt = ParseAlt();
     if(alt == nullptr) throw "No expression detected.";
 
     //Parsing $:
     if(checkEOT(scanner.getCurrentToken()))
     {
-        Node* eot = new Node('E', Node::END);
-        root = new Node(alt, eot, '*', Node::CON);
+        upNode eot = std::make_unique<SymbolNode>(0x03);
+        root = std::make_unique<ConNode>(alt, eot);
     }
     else throw "Expecting EOT";
 
@@ -28,9 +28,9 @@ Node* Parser::Parse() //Reg -> Alt, $;
     return root;
 }
 
-Node* Parser::ParseAlt() //Alt -> Con, {"|", Con};
+upNode Parser::ParseAlt() //Alt -> Con, {"|", Con};
 {
-    Node* leftAlt = nullptr;
+    upNode leftAlt = nullptr;
 
     //Parsing CON:
     leftAlt = ParseCon();
@@ -40,35 +40,35 @@ Node* Parser::ParseAlt() //Alt -> Con, {"|", Con};
     while(checkAlt(scanner.getCurrentToken()))
     {
         accept();
-        Node* rightAlt = ParseCon();
+        upNode rightAlt = ParseCon();
         if(rightAlt == nullptr) throw "No concatenation after alternative sign";
-        leftAlt = new Node(leftAlt, rightAlt, '|', Node::ALT);
+        leftAlt = std::make_unique<AltNode>(leftAlt, rightAlt);
     }
 
     return leftAlt;
 }
 
-Node* Parser::ParseCon() //Con -> Elem, {Elem};
+upNode Parser::ParseCon() //Con -> Elem, {Elem};
 {
-    Node* leftCon = nullptr;
+    upNode leftCon = nullptr;
     
     //Parsing element:
     leftCon = ParseElem();
     if(leftCon == nullptr) throw "A concatenation should start with an element";
 
     //Parsing concatenated elements:
-    Node* rightCon = nullptr;
+    upNode rightCon = nullptr;
     while((rightCon = ParseElem()) != nullptr)
     {
-        leftCon = new Node(leftCon, rightCon, '*', Node::CON);
+        leftCon = std::make_unique<ConNode>(leftCon, rightCon);
     }
 
     return leftCon;
 }
 
-Node* Parser::ParseElem() //Elem -> (symbol, Paren, Set), [op];
+upNode Parser::ParseElem() //Elem -> (symbol, Paren, Set), [op];
 {
-    Node* elem = nullptr;
+    upNode elem = nullptr;
     //Parsing symbol:
     elem = ParseSymbol();
     //Parsing paren:
@@ -78,14 +78,13 @@ Node* Parser::ParseElem() //Elem -> (symbol, Paren, Set), [op];
     if(elem == nullptr) return nullptr;
 
     //Parsing operator:
-    elem = ParseOp(elem);
+    upNode op = ParseOp(elem);
 
-    return elem;
 }
 
-Node* Parser::ParseParen() //Paren -> "(", Alt, ")";
+upNode Parser::ParseParen() //Paren -> "(", Alt, ")";
 {
-    Node* paren = nullptr;
+    upNode paren = nullptr;
 
     //Parsing (:
     if(checkLParen(scanner.getCurrentToken())) accept();
@@ -102,9 +101,10 @@ Node* Parser::ParseParen() //Paren -> "(", Alt, ")";
     return paren;
 }
 
-bool Parser::ParseInSet(NodeSet* arg)//(charMap& arg) //Inter -> inset, ["-", inset];
+bool Parser::ParseInSet()//(charMap& arg) //Inter -> inset, ["-", inset];
 {
-    unsigned char first = 5;
+    //cale do zmiany
+    /*unsigned char first = 5;
     unsigned char second = 10;
     //Parsing first element of interval:
     if(checkInSet(scanner.getCurrentToken()))
@@ -125,14 +125,13 @@ bool Parser::ParseInSet(NodeSet* arg)//(charMap& arg) //Inter -> inset, ["-", in
             accept();
         }
         else throw "'-' must be followed by a symbol";
-        arg->addChars(first, second);
     }
-    else arg->addChar(first);
-    return true;
+    return true;*/
 }
 
-Node* Parser::ParseSet() //Set -> "[", ["^"], ("]" | InSet), {InSet}, "]";
+upNode Parser::ParseSet() //Set -> "[", ["^"], ("]" | InSet), {InSet}, "]";
 {
+    /*
     //Parse [:
     if(checkLBracket(scanner.getCurrentToken())) accept();
     else return nullptr;
@@ -150,51 +149,50 @@ Node* Parser::ParseSet() //Set -> "[", ["^"], ("]" | InSet), {InSet}, "]";
         accept();
         set->RBracket = true;
     }
-    else if(!ParseInSet(set)) throw "Set cannot be empty []";
+    else if(!ParseInSet()) throw "Set cannot be empty []";
     
     //Parse set symbols in a loop:
-    while(ParseInSet(set)) {}
+    while(ParseInSet()) {}
 
     //Parse ]:
     if(checkRBracket(scanner.getCurrentToken())) accept();
     else throw "Expecting a ] symbol";
 
-    return set;
+    return set;*/
 }
 
-Node* Parser::ParseSymbol()
+upNode Parser::ParseSymbol()
 {
-    Node* symbol = nullptr;
+    upNode symbol = nullptr;
     if(checkSymbol(scanner.getCurrentToken()))
     {
-        symbol = new Node(scanner.getCurrentToken().value, Node::SYMBOL);
+        symbol = std::make_unique<SymbolNode>();
         accept();
     }
     return symbol;
 }
 
-Node* Parser::ParseOp(Node* arg)
+upNode Parser::ParseOp(upNode elem)
 {
-    Node* op = nullptr;
+    upNode op = nullptr;
     if(checkOperator(scanner.getCurrentToken()))
     {
         switch(scanner.getCurrentToken().value)
         {
             case '*':
-                op = new Node(arg, nullptr, '*', Node::KLEENE);
+                op = std::make_unique<KleeneNode>(elem);
                 break;
             case '+':
-                op = new Node(arg, nullptr, '+', Node::PLUS);
+                op = std::make_unique<PlusNode>(elem);
                 break;
             case '?':
-                op = new Node(arg, nullptr, '?', Node::OPTIONAL);
+                op = std::make_unique<OptionalNode>(elem);
                 break;
             default:
                 throw "Wrong operator";
         }
         accept();
     }
-    else op = arg;
     return op;
 }
 

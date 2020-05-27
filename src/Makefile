@@ -1,4 +1,4 @@
-CF = -Wall -std=c++11 -g
+CF = -Wall -std=c++17 -g
 
 all: main.o Source.o Token.o Scanner.o Parser.o Node.o
 	g++ main.o Source.o Token.o Scanner.o Parser.o Node.o -o exe.out

@@ -1,13 +1,14 @@
 #include <iostream>
 #include "Parser.h"
 #include "Node.h"
+#include <memory>
 
 int main()
 {
     std::string regexp = R"(ab+c|(a?|x[a5-9]))";
     regexp = R"(b+|(a?(abc)|a*|wxyz|[a-c]*ab)c)";
     Parser parser(regexp);
-    Node* temp;
+    std::unique_ptr<Node> temp;
     try
     {
         temp = parser.Parse(); //calls new
@@ -16,11 +17,5 @@ int main()
     {
         std::cout << msg << std::endl;
     };
-
-    if(temp != nullptr)
-    {
-        printTree(temp);
-        delete temp;
-    }
     return 0;
 }

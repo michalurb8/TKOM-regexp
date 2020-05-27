@@ -1,19 +1,23 @@
 #pragma once
 #include "Scanner.h"
 #include "Node.h"
+#include <memory>
+#include <optional>
+
+typedef std::unique_ptr<Node> upNode;
 
 class Parser
 {
     std::string errorDesc;
     Scanner scanner;
-    Node* ParseAlt();
-    Node* ParseCon();
-    Node* ParseElem();
-    Node* ParseParen();
-    bool ParseInSet(NodeSet* arg);
-    Node* ParseSet();
-    Node* ParseSymbol();
-    Node* ParseOp(Node* arg);
+    upNode ParseAlt();
+    upNode ParseCon();
+    upNode ParseElem();
+    upNode ParseParen();
+    bool ParseInSet();
+    upNode ParseSet();
+    upNode ParseSymbol();
+    upNode ParseOp(upNode elem);
 
     bool valid;
 
@@ -21,7 +25,7 @@ public:
     Parser() = delete;
     Parser(std::string text);
 
-    Node* Parse();
+    upNode Parse();
     void accept();
 
     bool getCorrect() const;
