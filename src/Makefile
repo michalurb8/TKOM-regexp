@@ -1,7 +1,7 @@
 CF = -Wall -std=c++17 -g
 
-all: main.o Source.o Token.o Scanner.o Parser.o Node.o
-	g++ main.o Source.o Token.o Scanner.o Parser.o Node.o -o exe.out
+all: main.o Source.o Token.o Scanner.o Parser.o Node.o Visitor.o
+	g++ main.o Source.o Token.o Scanner.o Parser.o Node.o Visitor.o -o exe.out
 
 main.o: main.cpp
 	g++ -c $(CF) main.cpp -o main.o
@@ -21,14 +21,8 @@ Node.o: Node.cpp Node.h
 Parser.o: Parser.cpp Parser.h
 	g++ -c $(CF) Parser.cpp -o Parser.o
 
-test: build_test
-	./test.out
-
-build_test: test.o Source.o Token.o Scanner.o
-	g++ test.o Source.o Token.o Scanner.o -o test.out
-
-test.o: test.cpp
-	g++ -c $(CF) test.cpp -o test.o
+Visitor.o: Visitor.cpp Visitor.h
+	g++ -c $(CF) Visitor.cpp -o Visitor.o
 
 clean:
 	rm *.o *.out -rf

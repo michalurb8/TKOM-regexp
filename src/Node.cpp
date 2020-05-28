@@ -1,4 +1,3 @@
-#include <iostream>
 #include <algorithm>
 #include "Node.h"
 
@@ -26,48 +25,95 @@ ConNode::ConNode(upNode left, upNode right)
 
 PlusNode::PlusNode(upNode down)
 {
-    this->left = std::move(left);
+    this->left = std::move(down);
     this->right = nullptr;
 }
 
 OptionalNode::OptionalNode(upNode down)
 {
-    this->left = std::move(left);
+    this->left = std::move(down);
     this->right = nullptr;
 }
 
 KleeneNode::KleeneNode(upNode down)
 {
-    this->left = std::move(left);
+    this->left = std::move(down);
     this->right = nullptr;
 }
 
 SetNode::SetNode(const std::vector<charRange>& ranges)
 {
-    std::cout << "values in range: ";
     for(auto elem : ranges)
     {
         for(char curr = elem.first; curr <= elem.second; ++curr)
         {
-            std::cout << curr;
             chars.insert(curr);
         }
-        std::cout << " ";
     }
-    std::cout << std::endl;
 }
 
 NegativeSetNode::NegativeSetNode(const std::vector<charRange>& ranges)
 {
-    std::cout << "Values out of range: ";
     for(auto elem : ranges)
     {
         for(char curr = elem.first; curr <= elem.second; ++curr)
         {
-            std::cout << curr;
             chars.insert(curr);
         }
-        std::cout << " ";
     }
-    std::cout << std::endl;
+}
+
+
+
+
+
+
+
+
+//all derived classes must accept the visitor:
+void SymbolNode::accept(Visitor& v)
+{
+    v.visit(this);
+}
+
+void AltNode::accept(Visitor& v)
+{
+    v.visit(this);
+    if(left) left->accept(v);
+    if(right) right->accept(v);
+}
+
+void ConNode::accept(Visitor& v)
+{
+    v.visit(this);
+    if(left) left->accept(v);
+    if(right) right->accept(v);
+}
+
+void KleeneNode::accept(Visitor& v)
+{
+    if(left) left->accept(v);
+    v.visit(this);
+}
+
+void OptionalNode::accept(Visitor& v)
+{
+    if(left) left->accept(v);
+    v.visit(this);
+}
+
+void PlusNode::accept(Visitor& v)
+{
+    if(left) left->accept(v);
+    v.visit(this);
+}
+
+void SetNode::accept(Visitor& v)
+{
+    v.visit(this);
+}
+
+void NegativeSetNode::accept(Visitor& v)
+{
+    v.visit(this);
 }

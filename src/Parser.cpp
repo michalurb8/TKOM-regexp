@@ -1,5 +1,4 @@
 #include "Parser.h"
-#include <iostream>
 
 Parser::Parser(std::string text)
 :scanner(text)
@@ -201,7 +200,6 @@ upNode Parser::ParseSymbol()
     upNode symbol = nullptr;
     if(checkSymbol(scanner.getCurrentToken()))
     {
-        std::cout << "Parsing symbol: " << scanner.getCurrentToken().value << std::endl;//TODO delete
         symbol = std::make_unique<SymbolNode>(scanner.getCurrentToken().value);
         accept();
     }
