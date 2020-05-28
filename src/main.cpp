@@ -8,6 +8,7 @@ int main()
 {
     std::string regexp = R"(ab+c|(a?|x[a5-9]))";
     regexp = R"(b+|(a?(c)|a*|wz|[^]za-c]*b)c)";
+    regexp = R"(a|b|c)";
 
     Parser parser(regexp);
     std::unique_ptr<Node> temp;

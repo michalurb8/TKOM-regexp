@@ -19,6 +19,10 @@ protected:
     Node();
 
 public:
+    bool nullable;
+    std::vector<char> first;
+    std::vector<char> last;
+    std::vector<char> follow;
     virtual void accept(class Visitor &v) = 0;
 };
 typedef std::unique_ptr<Node> upNode;
@@ -33,13 +37,13 @@ struct SymbolNode : public Node
 struct AltNode : public Node
 {
     void accept(class Visitor& v);
-    AltNode(upNode left, upNode right);
+    AltNode(upNode leftArg, upNode rightArg);
 };
 
 struct ConNode : public Node
 {
     void accept(class Visitor& v);
-    ConNode(upNode left, upNode right);
+    ConNode(upNode leftArg, upNode rightArg);
 };
 
 struct PlusNode : public Node

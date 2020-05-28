@@ -3,42 +3,88 @@
 
 Node::Node()
 {
-    
 }
 
 SymbolNode::SymbolNode(char arg)
 {
     value = arg;
+    //set nullable, first, last:
+    nullable = false;
+    first.push_back(arg);
+    last.push_back(arg);
 }
 
-AltNode::AltNode(upNode left, upNode right)
+AltNode::AltNode(upNode leftArg, upNode rightArg)
 {
-    this->left = std::move(left);
-    this->right = std::move(right);
+    this->left = std::move(leftArg);
+    this->right = std::move(rightArg);
+    //set nullable
+    if(left->nullable)
+    if(left->nullable || right->nullable) nullable = true;
+    //set first
+    for(auto i : left->first) this->first.push_back(i);
+    for(auto i : right->first) this->first.push_back(i);
+    //set last
+    for(auto i : left->last) this->last.push_back(i);
+    for(auto i : right->last) this->last.push_back(i);
 }
 
-ConNode::ConNode(upNode left, upNode right)
+ConNode::ConNode(upNode leftArg, upNode rightArg)
 {
-    this->left = std::move(left);
-    this->right = std::move(right);
+    this->left = std::move(leftArg);
+    this->right = std::move(rightArg);
+    //set nullable
+    if(left->nullable && right->nullable) nullable = true;
+    //set first
+    if(left->nullable)
+    {
+        for(auto i : left->first) this->first.push_back(i);
+        for(auto i : right->first) this->first.push_back(i);
+    }
+    else this->first = left->first;
+    //set last
+    if(right->nullable)
+    {
+        for(auto i : left->last) this->last.push_back(i);
+        for(auto i : right->last) this->last.push_back(i);
+    }
+    else this->last = right->last;
 }
 
 PlusNode::PlusNode(upNode down)
 {
     this->left = std::move(down);
     this->right = nullptr;
+    //set nullable
+    this->nullable = false;
+    //set first
+    this->first = left->first;
+    //set last
+    this->last = left->last;
 }
 
 OptionalNode::OptionalNode(upNode down)
 {
     this->left = std::move(down);
     this->right = nullptr;
+    //set nullable
+    this->nullable = true;
+    //set first
+    this->first = left->first;
+    //set last
+    this->last = left->last;
 }
 
 KleeneNode::KleeneNode(upNode down)
 {
     this->left = std::move(down);
     this->right = nullptr;
+    //set nullable
+    this->nullable = true;
+    //set first
+    this->first = left->first;
+    //set last
+    this->last = left->last;
 }
 
 SetNode::SetNode(const std::vector<charRange>& ranges)
@@ -50,10 +96,17 @@ SetNode::SetNode(const std::vector<charRange>& ranges)
             chars.insert(curr);
         }
     }
+    //set nullable
+    this->nullable = false;
+    //set first
+    for(auto i : chars) this->first.push_back(i);
+    //set last
+    this->last = this->first;
 }
 
 NegativeSetNode::NegativeSetNode(const std::vector<charRange>& ranges)
 {
+    throw "not yet pls";
     for(auto elem : ranges)
     {
         for(char curr = elem.first; curr <= elem.second; ++curr)
