@@ -3,20 +3,23 @@
 #include <vector>
 #include <set>
 
+struct charRange
+{
+    char first, second;
+};
+
+
 
 struct Node
 {
-private:
+protected:
     std::unique_ptr<Node> left;
     std::unique_ptr<Node> right;
-
-protected:
     Node();
 
 public:
     Node(const Node& arg) = delete;
     Node operator=(const Node& arg) = delete;
-    ~Node();
 };
 
 typedef std::unique_ptr<Node> upNode;
@@ -55,10 +58,11 @@ struct KleeneNode : public Node
 struct SetNode : public Node
 {
     std::set<char> chars;
-    SetNode(/* jakis wektor */);
+    SetNode(const std::vector<charRange>& ranges);
 };
 
-struct NegativeSetNode : public SetNode
+struct NegativeSetNode : public Node
 {
-    //to samo tylko odwrotnie 
+    std::set<char> chars;
+    NegativeSetNode(const std::vector<charRange>& ranges);
 };

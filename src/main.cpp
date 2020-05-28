@@ -6,16 +6,18 @@
 int main()
 {
     std::string regexp = R"(ab+c|(a?|x[a5-9]))";
-    regexp = R"(b+|(a?(abc)|a*|wxyz|[a-c]*ab)c)";
+//    regexp = R"(b+|(a?(abc)|a*|wxyz|[^]asjdkhfa-c]*ab)c)";
+
     Parser parser(regexp);
     std::unique_ptr<Node> temp;
     try
     {
-        temp = parser.Parse(); //calls new
+        temp = parser.Parse();
     }
     catch(const char* msg)
     {
-        std::cout << msg << std::endl;
+        std::cout << "ERROR: " << msg << std::endl;
+        std::cout << "on pos: " << parser.getErrorPos() << std::endl;
     };
     return 0;
 }
