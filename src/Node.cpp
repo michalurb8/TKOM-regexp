@@ -145,20 +145,20 @@ void ConNode::accept(Visitor& v)
 
 void KleeneNode::accept(Visitor& v)
 {
-    if(left) left->accept(v);
     v.visit(this);
+    if(left) left->accept(v);
 }
 
 void OptionalNode::accept(Visitor& v)
 {
-    if(left) left->accept(v);
     v.visit(this);
+    if(left) left->accept(v);
 }
 
 void PlusNode::accept(Visitor& v)
 {
-    if(left) left->accept(v);
     v.visit(this);
+    if(left) left->accept(v);
 }
 
 void SetNode::accept(Visitor& v)

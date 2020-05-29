@@ -32,3 +32,18 @@ class PrintVisitor : public Visitor
     void visit(struct SetNode *e);
     void visit(struct NegativeSetNode *e);
 };
+
+class SetFollowVisitor : public Visitor
+{
+    void visit(struct SymbolNode* e);
+
+    void visit(struct AltNode *e);
+    void visit(struct ConNode *e);
+
+    void visit(struct KleeneNode *e);
+    void visit(struct OptionalNode *e);
+    void visit(struct PlusNode *e);
+
+    void visit(struct SetNode *e);
+    void visit(struct NegativeSetNode *e);
+};

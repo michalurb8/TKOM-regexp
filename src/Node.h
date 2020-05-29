@@ -13,16 +13,16 @@ struct charRange
 
 struct Node
 {
-protected:
-    std::unique_ptr<Node> left;
-    std::unique_ptr<Node> right;
     Node();
 
-public:
+    std::unique_ptr<Node> left;
+    std::unique_ptr<Node> right;
+
     bool nullable;
     std::vector<char> first;
     std::vector<char> last;
     std::vector<char> follow;
+
     virtual void accept(class Visitor &v) = 0;
 };
 typedef std::unique_ptr<Node> upNode;

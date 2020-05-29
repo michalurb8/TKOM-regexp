@@ -7,8 +7,8 @@
 int main()
 {
     std::string regexp = R"(ab+c|(a?|x[a5-9]))";
-    regexp = R"(b+|(a?(c)|a*|wz|[^]za-c]*b)c)";
-    regexp = R"(a|b|c)";
+    regexp = R"((a|bc)d)";
+    regexp = R"(a+|(b?(c)|d*|ef|[]gh-i]*j)k)";
 
     Parser parser(regexp);
     std::unique_ptr<Node> temp;
@@ -22,8 +22,8 @@ int main()
         std::cout << "on pos: " << parser.getErrorPos() << std::endl;
     };
 
-    PrintVisitor a;
-    temp->accept(a);
+    SetFollowVisitor b;
+    temp->accept(b);
 
     return 0;
 }
