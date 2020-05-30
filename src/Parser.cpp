@@ -1,4 +1,5 @@
 #include "Parser.h"
+#include <vector>
 
 Parser::Parser(std::string text)
 :scanner(text)
@@ -12,7 +13,8 @@ void Parser::setRegExp(std::string text)
 
 upNode Parser::Parse() //Reg -> Alt, $;
 {
-    accept();
+    accept(); //load first token to the scanner
+    Node::reset(); //reset the tree structure
     upNode root = nullptr;
 
     //Parsing ALT:

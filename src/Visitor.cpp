@@ -1,44 +1,90 @@
 #include "Visitor.h"
 #include <iostream>
 
-void PrintVisitor::visit(struct SymbolNode* e)
+void DFSPrintVisitor::visit(struct SymbolNode* e)
 {
-    std::cout << "SYMBOL: " << e->value << std::endl;
+    std::cout << "SYM: " << e->value << " position: " << e->posNum;
+    std::cout << " first: ";
+    for(auto i : e->first) std::cout << i << " ";
+    std::cout << " last: ";
+    for(auto i : e->last) std::cout << i << " ";
+    std::cout << " follow: ";
+    for(auto i : e->follow) std::cout << i << " ";
+    std::cout << std::endl;
 }
 
-void PrintVisitor::visit(struct AltNode *e)
+void DFSPrintVisitor::visit(struct AltNode *e)
 {
-    std::cout << "ALT" << std::endl;
+    std::cout << "ALT";
+    std::cout << " first: ";
+    for(auto i : e->first) std::cout << i << " ";
+    std::cout << " last: ";
+    for(auto i : e->last) std::cout << i << " ";
+    std::cout << std::endl;
 }
 
-void PrintVisitor::visit(struct ConNode *e)
+void DFSPrintVisitor::visit(struct ConNode *e)
 {
-    std::cout << "CON" << std::endl;
+    std::cout << "CON";
+    std::cout << " first: ";
+    for(auto i : e->first) std::cout << i << " ";
+    std::cout << " last: ";
+    for(auto i : e->last) std::cout << i << " ";
+    std::cout << std::endl;
 }
 
-void PrintVisitor::visit(struct KleeneNode *e)
+void DFSPrintVisitor::visit(struct KleeneNode *e)
 {
-    std::cout << "*" << std::endl;
+    std::cout << "*";
+    std::cout << " first: ";
+    for(auto i : e->first) std::cout << i << " ";
+    std::cout << " last: ";
+    for(auto i : e->last) std::cout << i << " ";
+    std::cout << std::endl;
 }
 
-void PrintVisitor::visit(struct OptionalNode *e)
+void DFSPrintVisitor::visit(struct OptionalNode *e)
 {
-    std::cout << "?" << std::endl;
+    std::cout << "?";
+    std::cout << " first: ";
+    for(auto i : e->first) std::cout << i << " ";
+    std::cout << " last: ";
+    for(auto i : e->last) std::cout << i << " ";
+    std::cout << std::endl;
 }
 
-void PrintVisitor::visit(struct PlusNode *e)
+void DFSPrintVisitor::visit(struct PlusNode *e)
 {
-    std::cout << "+" << std::endl;
+    std::cout << "+";
+    std::cout << " first: ";
+    for(auto i : e->first) std::cout << i << " ";
+    std::cout << " last: ";
+    for(auto i : e->last) std::cout << i << " ";
+    std::cout << std::endl;
 }
 
-void PrintVisitor::visit(struct SetNode *e)
+void DFSPrintVisitor::visit(struct SetNode *e)
 {
-    std::cout << "[]" << std::endl;
+    std::cout << "[]" << " position: " << e->posNum;
+    std::cout << " first: ";
+    for(auto i : e->first) std::cout << i << " ";
+    std::cout << " last: ";
+    for(auto i : e->last) std::cout << i << " ";
+    std::cout << " follow: ";
+    for(auto i : e->follow) std::cout << i << " ";
+    std::cout << std::endl;
 }
 
-void PrintVisitor::visit(struct NegativeSetNode *e)
+void DFSPrintVisitor::visit(struct NegativeSetNode *e)
 {
-    std::cout << "[^]" << std::endl;
+    std::cout << "[^]" << " position: " << e->posNum;
+    std::cout << " first: ";
+    for(auto i : e->first) std::cout << i << " ";
+    std::cout << " last: ";
+    for(auto i : e->last) std::cout << i << " ";
+    std::cout << " follow: ";
+    for(auto i : e->follow) std::cout << i << " ";
+    std::cout << std::endl;
 }
 
 
@@ -48,9 +94,6 @@ void PrintVisitor::visit(struct NegativeSetNode *e)
 
 void SetFollowVisitor::visit(struct SymbolNode* e)
 {
-    std::cout << "currently in " << e->value << " : ";
-    for(auto i : e->follow) std::cout << i << " ";
-    std::cout << std::endl;
 }
 
 void SetFollowVisitor::visit(struct AltNode *e)
@@ -64,7 +107,7 @@ void SetFollowVisitor::visit(struct ConNode *e)
     if(e->right->nullable)
     {
         e->left->follow = e->right->first;
-        for(auto i : e->follow) e->left->follow.push_back(i);
+        for(auto i : e->follow) e->left->follow.insert(i);
     }
     else
     {
@@ -76,7 +119,7 @@ void SetFollowVisitor::visit(struct ConNode *e)
 void SetFollowVisitor::visit(struct KleeneNode *e)
 {
     e->left->follow = e->follow;
-    for(auto i : e->left->first) e->left->follow.push_back(i);
+    for(auto i : e->left->first) e->left->follow.insert(i);
 }
 
 void SetFollowVisitor::visit(struct OptionalNode *e)
@@ -87,7 +130,7 @@ void SetFollowVisitor::visit(struct OptionalNode *e)
 void SetFollowVisitor::visit(struct PlusNode *e)
 {
     e->left->follow = e->follow;
-    for(auto i : e->left->first) e->left->follow.push_back(i);
+    for(auto i : e->left->first) e->left->follow.insert(i);
 }
 
 void SetFollowVisitor::visit(struct SetNode *e)

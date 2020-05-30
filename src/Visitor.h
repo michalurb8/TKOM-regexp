@@ -18,7 +18,7 @@ public:
 };
 
 
-class PrintVisitor : public Visitor
+class DFSPrintVisitor : public Visitor
 {
     void visit(struct SymbolNode* e);
 

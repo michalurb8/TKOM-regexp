@@ -7,7 +7,6 @@
 int main()
 {
     std::string regexp = R"(ab+c|(a?|x[a5-9]))";
-    regexp = R"((a|bc)d)";
     regexp = R"(a+|(b?(c)|d*|ef|[]gh-i]*j)k)";
 
     Parser parser(regexp);
@@ -24,6 +23,9 @@ int main()
 
     SetFollowVisitor b;
     temp->accept(b);
+
+    DFSPrintVisitor a;
+    temp->accept(a);
 
     return 0;
 }
