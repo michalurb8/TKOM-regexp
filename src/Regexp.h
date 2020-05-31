@@ -23,13 +23,24 @@ struct State
 
 class Regexp
 {
+    std::string errorDesc;
     std::vector<State> states;
     std::vector<Dtrans> transitions;
     Parser parser;
+
+    unsigned int currState;
+    bool accepted;
+
+    bool step(char arg);
+    bool acceptable();
     
 public:
     Regexp(std::string text = "");
     void loadText(std::string text);
     bool build();
-    bool checkAcceptable(unsigned int a);
+    std::string getErrorDesc();
+
+    std::vector<unsigned int> getAllMatchesGreedy(std::string text);
+    std::vector<unsigned int> getAllMatchesLazy(std::string text);
+    bool check(std::string text);
 };

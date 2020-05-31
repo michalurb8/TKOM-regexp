@@ -1,47 +1,15 @@
-#include <iostream>
-#include "Parser.h"
-#include "Node.h"
-#include "Visitor.h"
-#include "Position.h"
 #include "Regexp.h"
 #include <memory>
+#include <iostream>
 
 int main()
 {
-    Regexp reg(R"(ab+c|(a?|x[a5-9]))");
+    Regexp reg("a*bc");
     reg.build();
-    return 0;
-    ///////////////////////////////////////
-
-    std::string regexp = R"(ab+c|(a?|x[a5-9]))";
-    regexp = R"(a+|(b?(c)|d*|e.f|[]gh-m]*j)k)";
-
-    Parser parser(regexp);
-    std::unique_ptr<Node> temp;
-    try
+    auto vec = reg.getAllMatchesGreedy("abcabbbcaabcaabcbacbccab");
+    for(auto i : vec)
     {
-        temp = parser.Parse();
-    }
-    catch(const char* msg)
-    {
-        std::cout << "ERROR: " << msg << std::endl;
-        std::cout << "on pos: " << parser.getErrorPos() << std::endl;
-    };
-
-    auto x = temp->getFirst();
-    std::cout << "first: ";
-    for(auto r : x) std::cout << r << " ";
-    std::cout << std::endl;
-    CalcPositionsVisitor b;
-    temp->accept(b);
-    auto c = b.getPositions();
-    for(auto d : c)
-    {
-        std::cout << "position: " << d.index << " values: ";
-        for(auto e:d.values) std::cout << e << " ";
-        std::cout << " follow: ";
-        for(auto f:d.follow) std::cout << f << " ";
-        std::cout << " negative: " << d.negative << std::endl;
+        std::cout << i << std::endl;
     }
     return 0;
 }
