@@ -1,4 +1,4 @@
-CF = -Wall -std=c++17 -g
+CF = -Wall -std=c++17 -Wextra -pedantic
 
 all: main.o Source.o Token.o Scanner.o Parser.o Node.o Visitor.o Regexp.o
 	g++ main.o Source.o Token.o Scanner.o Parser.o Node.o Visitor.o Regexp.o -o exe.out

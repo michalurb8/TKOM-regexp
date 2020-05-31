@@ -41,12 +41,11 @@ class Regexp
     bool acceptable();
     
 public:
-    Regexp(std::string text = "");
-    void loadText(std::string text);
-    bool build();
+    Regexp();
+    bool build(std::string);
     std::string getErrorDesc();
 
+    bool check(std::string text);
     std::vector<Fragment> getAllMatchesGreedy(std::string text);
     std::vector<Fragment> getAllMatchesLazy(std::string text);
-    bool check(std::string text);
 };

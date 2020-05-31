@@ -14,11 +14,9 @@ class Parser
     charRange ParseInSet();
     upNode ParseSet();
     upNode ParseSymbol();
-    upNode ParseOp(upNode elem);
 
 public:
-    Parser() = delete;
-    Parser(std::string text);
+    Parser(std::string text = "");
     void setRegExp(std::string text);
 
     upNode Parse();

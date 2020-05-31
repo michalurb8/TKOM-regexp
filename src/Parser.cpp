@@ -216,27 +216,6 @@ upNode Parser::ParseSymbol()
     return symbol;
 }
 
-upNode Parser::ParseOp(upNode elem)
-{
-    upNode op = nullptr;
-    switch(scanner.getCurrentToken().value)
-    {
-        case '*':
-            op = std::make_unique<KleeneNode>(std::move(elem));
-            break;
-        case '+':
-            op = std::make_unique<PlusNode>(std::move(elem));
-            break;
-        case '?':
-            op = std::make_unique<OptionalNode>(std::move(elem));
-            break;
-        default:
-            throw "Wrong operator";
-    }
-    accept();
-    return op;
-}
-
 unsigned int Parser::getErrorPos() const
 {
     return scanner.getCurrentToken().textPos;

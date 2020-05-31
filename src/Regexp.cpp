@@ -2,14 +2,9 @@
 #include "Visitor.h"
 #include <iostream>
 
-Regexp::Regexp(std::string text)
-:parser(text), currState(0), accepted(false)
+Regexp::Regexp()
+:currState(0), accepted(false)
 {
-}
-
-void Regexp::loadText(std::string text)
-{
-    parser.setRegExp(text);
 }
 
 std::string Regexp::getErrorDesc()
@@ -17,8 +12,9 @@ std::string Regexp::getErrorDesc()
     return errorDesc;
 }
 
-bool Regexp::build()
+bool Regexp::build(std::string text)
 {
+    parser = Parser(text);
     states.clear();
     transitions.clear();
 
@@ -105,7 +101,7 @@ std::vector<Fragment> Regexp::getAllMatchesLazy(std::string text)
         currState = 0;
         if(acceptable())
         {
-            result.push_back({ind, ind});
+            result.push_back({ind, ind, ""});
         }
         else
         {
