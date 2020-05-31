@@ -4,12 +4,12 @@
 
 int main()
 {
-    Regexp reg("a*bc");
+    Regexp reg("a*c");
     reg.build();
     auto vec = reg.getAllMatchesGreedy("abcabbbcaabcaabcbacbccab");
     for(auto i : vec)
     {
-        std::cout << i << std::endl;
+        std::cout << i.first << " " << i.second << " " << i.fragment << std::endl;
     }
     return 0;
 }

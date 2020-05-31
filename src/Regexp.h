@@ -8,6 +8,12 @@
 #include "Position.h"
 #include "Parser.h"
 
+struct Fragment
+{
+    unsigned int first, second;
+    std::string fragment;
+};
+
 struct Dtrans
 {
     unsigned int currentState;
@@ -40,7 +46,7 @@ public:
     bool build();
     std::string getErrorDesc();
 
-    std::vector<unsigned int> getAllMatchesGreedy(std::string text);
-    std::vector<unsigned int> getAllMatchesLazy(std::string text);
+    std::vector<Fragment> getAllMatchesGreedy(std::string text);
+    std::vector<Fragment> getAllMatchesLazy(std::string text);
     bool check(std::string text);
 };

@@ -96,25 +96,57 @@ bool Regexp::step(char arg)
     return false;
 }
 
-std::vector<unsigned int> Regexp::getAllMatchesGreedy(std::string text)
+std::vector<Fragment> Regexp::getAllMatchesLazy(std::string text)
 {
     unsigned int len = text.length();
-    std::vector<unsigned int> result;
+    std::vector<Fragment> result;
+    for(unsigned int ind = 0; ind < len; ++ind)
+    {
+        currState = 0;
+        if(acceptable())
+        {
+            result.push_back({ind, ind});
+        }
+        else
+        {
+            for(unsigned int inner = ind; inner < len; ++inner)
+            {
+                if(!step(text[inner])) break;
+                if(acceptable())
+                {
+                    result.push_back({ind, inner+1, text.substr(ind, inner-ind+1)});
+                    break;
+                }
+            }
+        }
+    }
+    return result;
+}
+
+std::vector<Fragment> Regexp::getAllMatchesGreedy(std::string text)
+{
+    unsigned int len = text.length();
+    std::vector<Fragment> result;
     for(unsigned int ind = 0; ind < len; ++ind)
     {
         currState = 0;
         unsigned int candidate;
         bool matched = false;
+        if(acceptable())
+        {
+            candidate = ind;
+            matched = true;
+        }
         for(unsigned int inner = ind; inner < len; ++inner)
         {
             if(!step(text[inner])) break;
             if(acceptable())
             {
-                candidate = ind;
+                candidate = inner + 1;
                 matched = true;
             }
         }
-        if(matched) result.push_back(candidate);
+        if(matched) result.push_back({ind, candidate, text.substr(ind, candidate-ind)});
     }
     return result;
 }
