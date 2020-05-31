@@ -32,7 +32,7 @@ public:
 
     std::set<unsigned int> getFirst();
 
-    friend class GetPositionsVisitor;
+    friend class CalcPositionsVisitor;
     friend class DFSPrintVisitor;
 
     friend class AltNode;

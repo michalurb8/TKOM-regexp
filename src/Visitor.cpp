@@ -91,20 +91,20 @@ void DFSPrintVisitor::visit(struct NegativeSetNode *e)
 
 
 
-void GetPositionsVisitor::visit(struct SymbolNode* e)
+void CalcPositionsVisitor::visit(struct SymbolNode* e)
 {
     std::set<char> values;
     values.insert(e->value);
     positions.push_back({e->posNum, values, e->follow, false});
 }
 
-void GetPositionsVisitor::visit(struct AltNode *e)
+void CalcPositionsVisitor::visit(struct AltNode *e)
 {
     e->left->follow = e->follow;    
     e->right->follow = e->follow;    
 }
 
-void GetPositionsVisitor::visit(struct ConNode *e)
+void CalcPositionsVisitor::visit(struct ConNode *e)
 {
     if(e->right->nullable)
     {
@@ -118,29 +118,29 @@ void GetPositionsVisitor::visit(struct ConNode *e)
     e->right->follow = e->follow;    
 }
 
-void GetPositionsVisitor::visit(struct KleeneNode *e)
+void CalcPositionsVisitor::visit(struct KleeneNode *e)
 {
     e->left->follow = e->follow;
     for(auto i : e->left->first) e->left->follow.insert(i);
 }
 
-void GetPositionsVisitor::visit(struct OptionalNode *e)
+void CalcPositionsVisitor::visit(struct OptionalNode *e)
 {
     e->left->follow = e->follow;
 }
 
-void GetPositionsVisitor::visit(struct PlusNode *e)
+void CalcPositionsVisitor::visit(struct PlusNode *e)
 {
     e->left->follow = e->follow;
     for(auto i : e->left->first) e->left->follow.insert(i);
 }
 
-void GetPositionsVisitor::visit(struct SetNode *e)
+void CalcPositionsVisitor::visit(struct SetNode *e)
 {
     positions.push_back({e->posNum, e->chars, e->follow, false});
 }
 
-void GetPositionsVisitor::visit(struct NegativeSetNode *e)
+void CalcPositionsVisitor::visit(struct NegativeSetNode *e)
 {
     positions.push_back({e->posNum, e->chars, e->follow, true});
 }
@@ -149,7 +149,7 @@ void GetPositionsVisitor::visit(struct NegativeSetNode *e)
 
 
 
-std::vector<Position> GetPositionsVisitor::getPositions()
+std::vector<Position> CalcPositionsVisitor::getPositions()
 {
     return positions;
 }

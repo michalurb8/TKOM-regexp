@@ -22,4 +22,5 @@ bool checkLBracket(const Token& arg);
 bool checkRBracket(const Token& arg);
 bool checkCaret(const Token& arg);
 bool checkDash(const Token& arg);
+bool checkDot(const Token& arg);
 bool checkEOT(const Token& arg);

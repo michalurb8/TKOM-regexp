@@ -102,6 +102,12 @@ bool checkDash(const Token& arg)
     return false;
 }
 
+bool checkDot(const Token& arg)
+{
+    if(arg.value == '.' && arg.escaped == false) return true;
+    return false;
+}
+
 bool checkEOT(const Token& arg)
 {
     if(arg.value == 0x03) return true;

@@ -3,12 +3,18 @@
 #include "Node.h"
 #include "Visitor.h"
 #include "Position.h"
+#include "Regexp.h"
 #include <memory>
 
 int main()
 {
+    Regexp reg(R"(ab+c|(a?|x[a5-9]))");
+    reg.build();
+    return 0;
+    ///////////////////////////////////////
+
     std::string regexp = R"(ab+c|(a?|x[a5-9]))";
-    regexp = R"(a+|(b?(c)|d*|ef|[]gh-m]*j)k)";
+    regexp = R"(a+|(b?(c)|d*|e.f|[]gh-m]*j)k)";
 
     Parser parser(regexp);
     std::unique_ptr<Node> temp;
@@ -26,7 +32,7 @@ int main()
     std::cout << "first: ";
     for(auto r : x) std::cout << r << " ";
     std::cout << std::endl;
-    GetPositionsVisitor b;
+    CalcPositionsVisitor b;
     temp->accept(b);
     auto c = b.getPositions();
     for(auto d : c)
@@ -37,6 +43,5 @@ int main()
         for(auto f:d.follow) std::cout << f << " ";
         std::cout << " negative: " << d.negative << std::endl;
     }
-
     return 0;
 }

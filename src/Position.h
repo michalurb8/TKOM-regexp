@@ -11,6 +11,12 @@ struct Position
 
     bool checkMatch(char arg)
     {
-        return (values.count(arg) != negative);
+        if(negative)
+        {
+            if(values.count(arg)) return false;
+            else return true;
+        }
+        if(values.count(arg)) return true;
+        else return false;
     }
 };

@@ -202,7 +202,15 @@ upNode Parser::ParseSymbol()
     upNode symbol = nullptr;
     if(checkSymbol(scanner.getCurrentToken()))
     {
-        symbol = std::make_unique<SymbolNode>(scanner.getCurrentToken().value);
+        if(checkDot(scanner.getCurrentToken()))
+        {
+            std::vector<charRange> empty;
+            symbol = std::make_unique<NegativeSetNode>(empty);
+        }
+        else
+        {
+            symbol = std::make_unique<SymbolNode>(scanner.getCurrentToken().value);
+        }
         accept();
     }
     return symbol;

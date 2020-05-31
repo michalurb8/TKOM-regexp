@@ -34,7 +34,7 @@ class DFSPrintVisitor : public Visitor
     void visit(struct NegativeSetNode *e);
 };
 
-class GetPositionsVisitor : public Visitor
+class CalcPositionsVisitor : public Visitor
 {
     std::vector<Position> positions;
     void visit(struct SymbolNode* e);
