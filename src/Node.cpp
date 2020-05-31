@@ -11,9 +11,11 @@ SymbolNode::SymbolNode(char arg)
 {
     posNum = Node::nextPos++;
     value = arg;
-    //set nullable, first, last:
+    //set nullable
     nullable = false;
+    //set first
     this->first.insert(posNum);
+    //set last
     this->last.insert(posNum);
 }
 

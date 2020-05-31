@@ -6,26 +6,6 @@ Token::Token()
 {
 }
 
-void print(Token arg)
-{
-    std::cout
-    << "Value: '" << arg.value
-    << "', int value: " << (int)arg.value
-    << ", position: " << arg.textPos
-    << ", escaped: " << (arg.escaped ? "yes" : "no")
-    << std::endl;
-}
-
-bool checktest(const Token& arg)
-{
-    if(arg.escaped == true) return false;
-    if(arg.value == 0x03) return false;
-    if(arg.value == '*') return true;
-    if(arg.value == '+') return true;
-    if(arg.value == '?') return true;
-    return false;
-}
-
 bool checkOperator(const Token& arg)
 {
     if(arg.escaped == true) return false;

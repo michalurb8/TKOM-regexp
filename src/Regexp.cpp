@@ -1,6 +1,6 @@
 #include "Regexp.h"
 #include "Visitor.h"
-#include <iostream>
+#include "Position.h"
 
 Regexp::Regexp()
 :currState(0), accepted(false)

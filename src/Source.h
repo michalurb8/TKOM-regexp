@@ -8,8 +8,7 @@ class Source
     unsigned int size;
 
 public:
-    Source();
-    Source(std::string textArg);
+    Source(std::string textArg = "");
 
     char peekChar() const;
     char getChar();

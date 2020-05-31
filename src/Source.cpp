@@ -1,11 +1,5 @@
 #include "Source.h"
 
-Source::Source()
-{
-    size = 0;
-    text = "";
-    currentPos = 0;
-}
 Source::Source(std::string textArg)
 :text(textArg), currentPos(0)
 {

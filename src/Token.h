@@ -2,16 +2,13 @@
 
 struct Token
 {
-    char value;                 //token value stored as a string
+    char value;                 //token value stored as a character
     unsigned int textPos;       //token position in text, used for debugging
-    bool escaped;
+    bool escaped;               //flag set if character was escaped
 
     Token();
 };
 
-void print(Token arg);          //for debugging
-
-bool checktest(const Token& arg);
 bool checkOperator(const Token& arg);
 bool checkSymbol(const Token& arg);
 bool checkInSet(const Token& arg);

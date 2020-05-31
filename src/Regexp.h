@@ -1,11 +1,9 @@
 #pragma once
 
 #include <string>
-
 #include <vector>
 #include <set>
 
-#include "Position.h"
 #include "Parser.h"
 
 struct Fragment

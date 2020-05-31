@@ -2,7 +2,7 @@
 #include "Node.h"
 #include "Position.h"
 
-class Visitor
+class Visitor //A visitor class for traversing Node tree structure
 {
 public:
     virtual void visit(struct SymbolNode* e) = 0;
@@ -19,7 +19,7 @@ public:
 };
 
 
-class DFSPrintVisitor : public Visitor
+class DFSPrintVisitor : public Visitor //A visitor for printing tree contents
 {
     void visit(struct SymbolNode* e);
 
@@ -34,7 +34,7 @@ class DFSPrintVisitor : public Visitor
     void visit(struct NegativeSetNode *e);
 };
 
-class CalcPositionsVisitor : public Visitor
+class CalcPositionsVisitor : public Visitor //A visitor setting "follow", constructing a position vector
 {
     std::vector<Position> positions;
     void visit(struct SymbolNode* e);
