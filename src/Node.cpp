@@ -134,6 +134,8 @@ void Node::reset()
 
 
 
+
+
 //all derived classes must accept the visitor:
 void SymbolNode::accept(Visitor& v)
 {
@@ -180,4 +182,13 @@ void SetNode::accept(Visitor& v)
 void NegativeSetNode::accept(Visitor& v)
 {
     v.visit(this);
+}
+
+
+
+
+
+std::set<unsigned int> Node::getFirst()
+{
+    return first;
 }

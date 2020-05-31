@@ -1,5 +1,6 @@
 #pragma once
 #include "Node.h"
+#include "Position.h"
 
 class Visitor
 {
@@ -33,8 +34,9 @@ class DFSPrintVisitor : public Visitor
     void visit(struct NegativeSetNode *e);
 };
 
-class SetFollowVisitor : public Visitor
+class GetPositionsVisitor : public Visitor
 {
+    std::vector<Position> positions;
     void visit(struct SymbolNode* e);
 
     void visit(struct AltNode *e);
@@ -46,4 +48,6 @@ class SetFollowVisitor : public Visitor
 
     void visit(struct SetNode *e);
     void visit(struct NegativeSetNode *e);
+public:
+    std::vector<Position> getPositions();
 };

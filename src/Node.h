@@ -30,7 +30,9 @@ public:
 
     virtual void accept(class Visitor &v) = 0;
 
-    friend class SetFollowVisitor;
+    std::set<unsigned int> getFirst();
+
+    friend class GetPositionsVisitor;
     friend class DFSPrintVisitor;
 
     friend class AltNode;
