@@ -1,14 +1,14 @@
 #include "Regexp.h"
 #include "Visitor.h"
-#include "Position.h"
 
 Regexp::Regexp()
-:currState(0), accepted(false)
+:currState(0), valid(false)
 {
 }
 
 std::string Regexp::getErrorDesc()
 {
+    if(errorDesc == "") return "No errors";
     return errorDesc;
 }
 
@@ -76,11 +76,13 @@ bool Regexp::build(std::string text)
             transitions.push_back({stateInd, ch, nextState});
         }
     }
+    valid = true;
     return true;
 }
 
 bool Regexp::step(char arg)
 {
+    if(valid == false) return false;
     for(auto t : transitions)
     {
         if(t.currentState == this->currState && t.input == arg)
@@ -94,8 +96,9 @@ bool Regexp::step(char arg)
 
 std::vector<Fragment> Regexp::getAllMatchesLazy(std::string text)
 {
-    unsigned int len = text.length();
     std::vector<Fragment> result;
+    if(valid == false) return result;
+    unsigned int len = text.length();
     for(unsigned int ind = 0; ind < len; ++ind)
     {
         currState = 0;
@@ -121,8 +124,9 @@ std::vector<Fragment> Regexp::getAllMatchesLazy(std::string text)
 
 std::vector<Fragment> Regexp::getAllMatchesGreedy(std::string text)
 {
-    unsigned int len = text.length();
     std::vector<Fragment> result;
+    if(valid == false) return result;
+    unsigned int len = text.length();
     for(unsigned int ind = 0; ind < len; ++ind)
     {
         currState = 0;
@@ -149,11 +153,13 @@ std::vector<Fragment> Regexp::getAllMatchesGreedy(std::string text)
 
 bool Regexp::acceptable()
 {
+    if(valid == false) return false;
     return states[currState].acceptable;
 }
 
 bool Regexp::check(std::string text)
 {
+    if(valid == false) return false;
     currState = 0;
     for(char a : text)
     {

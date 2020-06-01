@@ -33,7 +33,7 @@ class Regexp
     Parser parser;
 
     unsigned int currState;
-    bool accepted;
+    bool valid;
 
     bool step(char arg);
     bool acceptable();
